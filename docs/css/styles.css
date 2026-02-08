@@ -693,8 +693,8 @@ footer a:hover {
 
 .step-column {
     flex: 1 1 0;
-    min-width: 200px;
-    max-width: 280px;
+    min-width: 220px;
+    max-width: 320px;
     background: var(--bg-primary);
     border: 2px solid var(--border-color);
     border-radius: 8px;
@@ -799,16 +799,15 @@ footer a:hover {
     text-align: center;
 }
 
-/* Add 5th column for steps 2-3 only (not step 4) */
+/* Add 5th column for steps 2-4 */
 #stepCol2 .compact-header,
-#stepCol3 .compact-header {
+#stepCol3 .compact-header,
+#stepCol4 .compact-header {
     grid-template-columns: 1fr 1fr 1fr 1fr 0.8fr;
 }
 
-/* Step 4 has only 4 columns (no delta) */
 #stepCol4 .compact-header {
     background: var(--accent-green);
-    grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 .compact-rows {
@@ -825,15 +824,11 @@ footer a:hover {
     opacity: 0;
 }
 
-/* Add 5th column for steps 2-3 only */
+/* Add 5th column for steps 2-4 */
 #ordersStep2 .compact-row,
-#ordersStep3 .compact-row {
-    grid-template-columns: 1fr 1fr 1fr 1fr 0.8fr;
-}
-
-/* Step 4 has only 4 columns (no delta) */
+#ordersStep3 .compact-row,
 #ordersStep4 .compact-row {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 0.8fr;
 }
 
 .compact-row:nth-child(odd) {
