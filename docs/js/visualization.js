@@ -33,7 +33,7 @@ class OrderBookVisualizer {
         const padding = { top: 30, right: 60, bottom: 40, left: 60 };
 
         // Clear canvas
-        ctx.fillStyle = '#21262d';
+        ctx.fillStyle = '#eaeef2';
         ctx.fillRect(0, 0, width, height);
 
         // Get depth data
@@ -41,7 +41,7 @@ class OrderBookVisualizer {
         const askDepth = orderBook.getDepth(Side.SELL, 20, false);
 
         if (bidDepth.length === 0 && askDepth.length === 0) {
-            ctx.fillStyle = '#8b949e';
+            ctx.fillStyle = '#656d76';
             ctx.font = '14px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('No orders in the book', width / 2, height / 2);
@@ -70,7 +70,7 @@ class OrderBookVisualizer {
         const qtyToY = (qty) => padding.top + chartHeight - (qty / maxCumQty) * chartHeight;
 
         // Draw grid
-        ctx.strokeStyle = '#30363d';
+        ctx.strokeStyle = '#d0d7de';
         ctx.lineWidth = 1;
         
         // Horizontal grid lines
@@ -83,7 +83,7 @@ class OrderBookVisualizer {
             
             // Y-axis labels
             const qty = maxCumQty * (1 - i / 4);
-            ctx.fillStyle = '#8b949e';
+            ctx.fillStyle = '#656d76';
             ctx.font = '11px monospace';
             ctx.textAlign = 'right';
             ctx.fillText(Math.round(qty).toString(), padding.left - 10, y + 4);
@@ -93,7 +93,7 @@ class OrderBookVisualizer {
         const midpoint = orderBook.getMidpoint(true);
         if (midpoint) {
             const midX = priceToX(midpoint);
-            ctx.strokeStyle = '#58a6ff';
+            ctx.strokeStyle = '#0969da';
             ctx.setLineDash([5, 5]);
             ctx.beginPath();
             ctx.moveTo(midX, padding.top);
@@ -102,7 +102,7 @@ class OrderBookVisualizer {
             ctx.setLineDash([]);
             
             // Midpoint label
-            ctx.fillStyle = '#58a6ff';
+            ctx.fillStyle = '#0969da';
             ctx.font = '11px monospace';
             ctx.textAlign = 'center';
             ctx.fillText(`Mid: ${midpoint.toFixed(2)}`, midX, padding.top - 10);
@@ -120,10 +120,10 @@ class OrderBookVisualizer {
             ctx.lineTo(priceToX(bidCumulative[bidCumulative.length - 1].price), qtyToY(0));
             ctx.closePath();
             
-            ctx.fillStyle = 'rgba(35, 134, 54, 0.3)';
+            ctx.fillStyle = 'rgba(26, 127, 55, 0.3)';
             ctx.fill();
             
-            ctx.strokeStyle = '#238636';
+            ctx.strokeStyle = '#1a7f37';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(priceToX(bidCumulative[0].price), qtyToY(bidCumulative[0].cumulative));
@@ -145,10 +145,10 @@ class OrderBookVisualizer {
             ctx.lineTo(priceToX(askCumulative[askCumulative.length - 1].price), qtyToY(0));
             ctx.closePath();
             
-            ctx.fillStyle = 'rgba(218, 54, 51, 0.3)';
+            ctx.fillStyle = 'rgba(207, 34, 46, 0.3)';
             ctx.fill();
             
-            ctx.strokeStyle = '#da3633';
+            ctx.strokeStyle = '#cf222e';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(priceToX(askCumulative[0].price), qtyToY(askCumulative[0].cumulative));
@@ -160,7 +160,7 @@ class OrderBookVisualizer {
 
         // X-axis labels
         const priceStep = (maxPrice - minPrice) / 5;
-        ctx.fillStyle = '#8b949e';
+        ctx.fillStyle = '#656d76';
         ctx.font = '11px monospace';
         ctx.textAlign = 'center';
         for (let i = 0; i <= 5; i++) {
@@ -170,7 +170,7 @@ class OrderBookVisualizer {
         }
 
         // Axis titles
-        ctx.fillStyle = '#c9d1d9';
+        ctx.fillStyle = '#1f2328';
         ctx.font = '12px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Price', width / 2, height - 5);
@@ -185,14 +185,14 @@ class OrderBookVisualizer {
         ctx.font = '11px sans-serif';
         ctx.textAlign = 'left';
         
-        ctx.fillStyle = '#238636';
+        ctx.fillStyle = '#1a7f37';
         ctx.fillRect(width - padding.right - 80, padding.top, 12, 12);
-        ctx.fillStyle = '#c9d1d9';
+        ctx.fillStyle = '#1f2328';
         ctx.fillText('Bids', width - padding.right - 64, padding.top + 10);
         
-        ctx.fillStyle = '#da3633';
+        ctx.fillStyle = '#cf222e';
         ctx.fillRect(width - padding.right - 80, padding.top + 18, 12, 12);
-        ctx.fillStyle = '#c9d1d9';
+        ctx.fillStyle = '#1f2328';
         ctx.fillText('Asks', width - padding.right - 64, padding.top + 28);
     }
 
