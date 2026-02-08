@@ -96,7 +96,6 @@ function loadSampleOrders() {
     currentStep = 0;
     
     // Sample orders matching the lecture example (Buy orders)
-    // These will be shown in arrival order first, then sorted step by step
     demoOrders = [
         { price: 32.01, visible: false, time: '10:00', trader: 5, arrivalOrder: 0 },
         { price: 34.05, visible: true,  time: '10:01', trader: 3, arrivalOrder: 1 },
@@ -107,17 +106,15 @@ function loadSampleOrders() {
         { price: 33.05, visible: true,  time: '10:22', trader: 7, arrivalOrder: 6 },
     ];
     
-    // Hide all step blocks except step 1
+    // Hide all columns and arrows except column 1
     for (let i = 2; i <= 4; i++) {
-        const block = document.getElementById(`stepBlock${i}`);
-        if (block) block.style.display = 'none';
+        const col = document.getElementById(`stepCol${i}`);
+        if (col) col.style.display = 'none';
+        const arrow = document.getElementById(`arrow${i - 1}`);
+        if (arrow) arrow.style.display = 'none';
     }
     
-    // Show step 1 and populate it
-    const step1Block = document.getElementById('stepBlock1');
-    if (step1Block) step1Block.style.display = 'block';
-    
-    // Populate step 1 with arrival order
+    // Populate step 1 with arrival order (no movement column)
     populateStepOrders(1, getSortedOrdersForStep(0));
     
     // Update button
@@ -162,24 +159,52 @@ function getSortedOrdersForStep(step) {
 }
 
 /**
- * Populate orders for a specific step container
+ * Populate orders for a specific step container with movement indicators
  */
-function populateStepOrders(stepNum, orders) {
+function populateStepOrders(stepNum, orders, prevOrders = null) {
     const container = document.getElementById(`ordersStep${stepNum}`);
     if (!container) return;
     
     container.innerHTML = '';
     
+    // Create a map of previous positions by trader number
+    let prevPositions = {};
+    if (prevOrders) {
+        prevOrders.forEach((order, index) => {
+            prevPositions[order.trader] = index;
+        });
+    }
+    
     orders.forEach((order, index) => {
         const row = document.createElement('div');
-        row.className = 'demo-order-row';
-        row.style.animationDelay = `${index * 0.06}s`;
+        row.className = 'compact-row';
+        row.style.animationDelay = `${index * 0.04}s`;
+        
+        // Calculate movement
+        let movementHtml = '';
+        if (prevOrders) {
+            const prevPos = prevPositions[order.trader];
+            const movement = prevPos - index; // positive = moved up, negative = moved down
+            
+            if (movement > 0) {
+                movementHtml = `<span class="move-indicator move-up">↑${movement}</span>`;
+            } else if (movement < 0) {
+                movementHtml = `<span class="move-indicator move-down">↓${Math.abs(movement)}</span>`;
+            } else {
+                movementHtml = `<span class="move-indicator move-same">−</span>`;
+            }
+        }
+        
+        // Compact visibility display
+        const visDisplay = order.visible ? 'V' : 'H';
+        const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
         row.innerHTML = `
-            <span class="demo-price">${order.price.toFixed(2)}</span>
-            <span class="demo-visibility ${order.visible ? 'visible' : 'hidden'}">${order.visible ? 'Visible' : 'Hidden'}</span>
-            <span class="demo-time">${order.time}</span>
-            <span class="demo-trader">${order.trader}</span>
+            <span class="cell-price">${order.price.toFixed(2)}</span>
+            <span class="cell-vis ${visClass}">${visDisplay}</span>
+            <span class="cell-time">${order.time}</span>
+            <span class="cell-trader">${order.trader}</span>
+            ${movementHtml}
         `;
         
         container.appendChild(row);
@@ -194,9 +219,9 @@ function updateProcessButton() {
     if (!processBtn) return;
     
     const buttonTexts = [
-        '▶ Next Step: Apply Price Priority',
-        '▶ Next Step: Apply Visibility Priority',
-        '▶ Next Step: Apply Time Priority (FIFO)',
+        '▶ Apply Price Priority',
+        '▶ Apply Visibility Priority',
+        '▶ Apply Time Priority (FIFO)',
         '↺ Start Over'
     ];
     
@@ -218,19 +243,22 @@ function processLimitOrderBook() {
         return;
     }
     
+    // Get previous step's order for comparison
+    const prevOrders = getSortedOrdersForStep(currentStep);
+    
     // Move to next step
     currentStep++;
     
-    // Show the new step block with animation
-    const stepBlock = document.getElementById(`stepBlock${currentStep + 1}`);
-    if (stepBlock) {
-        stepBlock.style.display = 'block';
-        // Populate with sorted orders for this step
-        populateStepOrders(currentStep + 1, getSortedOrdersForStep(currentStep));
-        // Scroll to the new block
-        setTimeout(() => {
-            stepBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+    // Show the arrow before the new column
+    const arrow = document.getElementById(`arrow${currentStep}`);
+    if (arrow) arrow.style.display = 'flex';
+    
+    // Show the new column
+    const stepCol = document.getElementById(`stepCol${currentStep + 1}`);
+    if (stepCol) {
+        stepCol.style.display = 'block';
+        // Populate with sorted orders for this step, passing previous orders for comparison
+        populateStepOrders(currentStep + 1, getSortedOrdersForStep(currentStep), prevOrders);
     }
     
     // Update button text
@@ -243,16 +271,12 @@ function processLimitOrderBook() {
 function resetDemo() {
     currentStep = 0;
     
-    // Hide all step blocks except step 1
+    // Hide all columns and arrows except column 1
     for (let i = 2; i <= 4; i++) {
-        const block = document.getElementById(`stepBlock${i}`);
-        if (block) block.style.display = 'none';
-    }
-    
-    // Scroll back to top
-    const step1Block = document.getElementById('stepBlock1');
-    if (step1Block) {
-        step1Block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const col = document.getElementById(`stepCol${i}`);
+        if (col) col.style.display = 'none';
+        const arrow = document.getElementById(`arrow${i - 1}`);
+        if (arrow) arrow.style.display = 'none';
     }
     
     // Update button
