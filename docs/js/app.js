@@ -7,10 +7,11 @@
 let orderBook;
 let visualizer;
 
-// Demo state for step-by-step processing
-let demoOrders = [];
-let currentStep = 0;
-let currentOrderType = 'buy'; // 'buy' or 'sell'
+// Demo state for step-by-step processing - separate for buy and sell
+let buyDemoOrders = [];
+let sellDemoOrders = [];
+let buyCurrentStep = 0;
+let sellCurrentStep = 0;
 
 const STEPS = {
     ARRIVAL: 0,
@@ -66,7 +67,7 @@ function selectMode(mode) {
     
     if (mode === 'sample') {
         document.getElementById('sampleDemo').style.display = 'block';
-        loadSampleOrders();
+        loadAllSampleOrders();
     } else if (mode === 'custom') {
         document.getElementById('customDemo').style.display = 'block';
     }
@@ -81,8 +82,10 @@ function backToModeSelection() {
     document.getElementById('modeSelection').style.display = 'block';
     
     // Reset demo state
-    demoOrders = [];
-    currentStep = 0;
+    buyDemoOrders = [];
+    sellDemoOrders = [];
+    buyCurrentStep = 0;
+    sellCurrentStep = 0;
 }
 
 /**
@@ -113,72 +116,56 @@ function handleOrderSubmit(event) {
 }
 
 /**
- * Switch between Buy and Sell order types
+ * Load all sample orders (both buy and sell sections)
  */
-function switchOrderType(type) {
-    currentOrderType = type;
-    
-    // Update toggle buttons
-    const btnBuy = document.getElementById('btnBuyOrders');
-    const btnSell = document.getElementById('btnSellOrders');
-    const stepsContainer = document.getElementById('stepsContainer');
-    
-    if (type === 'buy') {
-        btnBuy.classList.add('active');
-        btnBuy.classList.remove('sell-active');
-        btnSell.classList.remove('active', 'sell-active');
-        if (stepsContainer) stepsContainer.classList.remove('sell-mode');
-    } else {
-        btnSell.classList.add('active', 'sell-active');
-        btnBuy.classList.remove('active');
-        if (stepsContainer) stepsContainer.classList.add('sell-mode');
-    }
-    
-    // Update title
-    const title = document.getElementById('demoTitle');
-    if (title) {
-        title.textContent = type === 'buy' 
-            ? '📋 Limit Order Processing - Buy Orders Priority Rules'
-            : '📋 Limit Order Processing - Sell Orders Priority Rules';
-    }
-    
-    // Reload sample orders with new type
-    loadSampleOrders();
+function loadAllSampleOrders() {
+    loadBuySampleOrders();
+    loadSellSampleOrders();
+    console.log('Both Buy and Sell orders loaded - Click buttons to see prioritisation steps');
 }
 
 /**
- * Load sample orders to demonstrate the matching engine
+ * Load sample buy orders
  */
-function loadSampleOrders() {
-    orderBook.clear();
-    currentStep = 0;
+function loadBuySampleOrders() {
+    buyCurrentStep = 0;
+    buyDemoOrders = [...BUY_ORDERS];
     
-    // Load orders based on current type
-    demoOrders = currentOrderType === 'buy' 
-        ? [...BUY_ORDERS] 
-        : [...SELL_ORDERS];
-    
-    // Hide all columns and arrows except column 1
+    // Hide all columns and arrows except column 1 (for buy section)
     for (let i = 2; i <= 4; i++) {
-        const col = document.getElementById(`stepCol${i}`);
+        const col = document.getElementById(`buyStepCol${i}`);
         if (col) col.style.display = 'none';
-        const arrow = document.getElementById(`arrow${i - 1}`);
+        const arrow = document.getElementById(`buyArrow${i - 1}`);
         if (arrow) arrow.style.display = 'none';
     }
     
-    // Populate step 1 with arrival order (no movement column)
-    populateStepOrders(1, getSortedOrdersForStep(0));
-    
-    // Update arrow label for price direction
-    const arrow1Label = document.querySelector('#arrow1 .arrow-label');
-    if (arrow1Label) {
-        arrow1Label.textContent = currentOrderType === 'buy' ? 'Price ↓' : 'Price ↑';
-    }
+    // Populate step 1 with arrival order
+    populateBuyStepOrders(1, getSortedOrdersForStep(0, 'buy'));
     
     // Update button
-    updateProcessButton();
+    updateBuyProcessButton();
+}
+
+/**
+ * Load sample sell orders
+ */
+function loadSellSampleOrders() {
+    sellCurrentStep = 0;
+    sellDemoOrders = [...SELL_ORDERS];
     
-    console.log(`${currentOrderType.toUpperCase()} orders loaded - Click button to see each prioritisation step`);
+    // Hide all columns and arrows except column 1 (for sell section)
+    for (let i = 2; i <= 4; i++) {
+        const col = document.getElementById(`sellStepCol${i}`);
+        if (col) col.style.display = 'none';
+        const arrow = document.getElementById(`sellArrow${i - 1}`);
+        if (arrow) arrow.style.display = 'none';
+    }
+    
+    // Populate step 1 with arrival order
+    populateSellStepOrders(1, getSortedOrdersForStep(0, 'sell'));
+    
+    // Update button
+    updateSellProcessButton();
 }
 
 /**
@@ -186,9 +173,9 @@ function loadSampleOrders() {
  * Buy orders: higher prices get priority
  * Sell orders: lower prices get priority
  */
-function getSortedOrdersForStep(step) {
-    let sorted = [...demoOrders];
-    const isBuy = currentOrderType === 'buy';
+function getSortedOrdersForStep(step, orderType) {
+    const isBuy = orderType === 'buy';
+    let sorted = isBuy ? [...buyDemoOrders] : [...sellDemoOrders];
     
     switch (step) {
         case STEPS.ARRIVAL:
@@ -228,10 +215,10 @@ function getSortedOrdersForStep(step) {
 }
 
 /**
- * Populate orders for a specific step container with movement indicators
+ * Populate orders for buy section step container with movement indicators
  */
-function populateStepOrders(stepNum, orders, prevOrders = null) {
-    const container = document.getElementById(`ordersStep${stepNum}`);
+function populateBuyStepOrders(stepNum, orders, prevOrders = null) {
+    const container = document.getElementById(`buyOrdersStep${stepNum}`);
     if (!container) return;
     
     container.innerHTML = '';
@@ -256,7 +243,7 @@ function populateStepOrders(stepNum, orders, prevOrders = null) {
         let movementHtml = '';
         if (showMovement) {
             const prevPos = prevPositions[order.trader];
-            const movement = prevPos - index; // positive = moved up, negative = moved down
+            const movement = prevPos - index;
             
             if (movement > 0) {
                 movementHtml = `<span class="move-indicator move-up">↑${movement}</span>`;
@@ -267,7 +254,6 @@ function populateStepOrders(stepNum, orders, prevOrders = null) {
             }
         }
         
-        // Compact visibility display
         const visDisplay = order.visible ? 'V' : 'H';
         const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
@@ -284,10 +270,65 @@ function populateStepOrders(stepNum, orders, prevOrders = null) {
 }
 
 /**
- * Update the process button text based on current step
+ * Populate orders for sell section step container with movement indicators
  */
-function updateProcessButton() {
-    const processBtn = document.getElementById('processBtn');
+function populateSellStepOrders(stepNum, orders, prevOrders = null) {
+    const container = document.getElementById(`sellOrdersStep${stepNum}`);
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Create a map of previous positions by trader number
+    let prevPositions = {};
+    if (prevOrders) {
+        prevOrders.forEach((order, index) => {
+            prevPositions[order.trader] = index;
+        });
+    }
+    
+    // Show movement column for steps 2-4
+    const showMovement = prevOrders !== null;
+    
+    orders.forEach((order, index) => {
+        const row = document.createElement('div');
+        row.className = 'compact-row sell-row';
+        row.style.animationDelay = `${index * 0.04}s`;
+        
+        // Calculate movement for steps 2-4
+        let movementHtml = '';
+        if (showMovement) {
+            const prevPos = prevPositions[order.trader];
+            const movement = prevPos - index;
+            
+            if (movement > 0) {
+                movementHtml = `<span class="move-indicator move-up">↑${movement}</span>`;
+            } else if (movement < 0) {
+                movementHtml = `<span class="move-indicator move-down">↓${Math.abs(movement)}</span>`;
+            } else {
+                movementHtml = `<span class="move-indicator move-same">−</span>`;
+            }
+        }
+        
+        const visDisplay = order.visible ? 'V' : 'H';
+        const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
+        
+        row.innerHTML = `
+            <span class="cell-price sell-price">${order.price.toFixed(2)}</span>
+            <span class="cell-vis ${visClass}">${visDisplay}</span>
+            <span class="cell-time">${order.time}</span>
+            <span class="cell-trader sell-trader">${order.trader}</span>
+            ${movementHtml}
+        `;
+        
+        container.appendChild(row);
+    });
+}
+
+/**
+ * Update the buy process button text based on current step
+ */
+function updateBuyProcessButton() {
+    const processBtn = document.getElementById('buyProcessBtn');
     if (!processBtn) return;
     
     const buttonTexts = [
@@ -297,62 +338,126 @@ function updateProcessButton() {
         '↺ Start Over'
     ];
     
-    processBtn.textContent = buttonTexts[currentStep];
+    processBtn.textContent = buttonTexts[buyCurrentStep];
 }
 
 /**
- * Process the next step of limit order book prioritisation
+ * Update the sell process button text based on current step
  */
-function processLimitOrderBook() {
-    if (demoOrders.length === 0) {
-        alert('Please load sample orders first!');
+function updateSellProcessButton() {
+    const processBtn = document.getElementById('sellProcessBtn');
+    if (!processBtn) return;
+    
+    const buttonTexts = [
+        '▶ Apply Price Priority',
+        '▶ Apply Visibility Priority',
+        '▶ Apply Time Priority (FIFO)',
+        '↺ Start Over'
+    ];
+    
+    processBtn.textContent = buttonTexts[sellCurrentStep];
+}
+
+/**
+ * Process the next step of buy limit order book prioritisation
+ */
+function processBuyLimitOrderBook() {
+    if (buyDemoOrders.length === 0) {
+        loadBuySampleOrders();
         return;
     }
     
     // If we're at the last step, reset
-    if (currentStep >= STEPS.TIME) {
-        resetDemo();
+    if (buyCurrentStep >= STEPS.TIME) {
+        resetBuyDemo();
         return;
     }
     
     // Get previous step's order for comparison
-    const prevOrders = getSortedOrdersForStep(currentStep);
+    const prevOrders = getSortedOrdersForStep(buyCurrentStep, 'buy');
     
     // Move to next step
-    currentStep++;
+    buyCurrentStep++;
     
     // Show the arrow before the new column
-    const arrow = document.getElementById(`arrow${currentStep}`);
+    const arrow = document.getElementById(`buyArrow${buyCurrentStep}`);
     if (arrow) arrow.style.display = 'flex';
     
     // Show the new column
-    const stepCol = document.getElementById(`stepCol${currentStep + 1}`);
+    const stepCol = document.getElementById(`buyStepCol${buyCurrentStep + 1}`);
     if (stepCol) {
         stepCol.style.display = 'block';
-        // Populate with sorted orders for this step, passing previous orders for comparison
-        populateStepOrders(currentStep + 1, getSortedOrdersForStep(currentStep), prevOrders);
+        populateBuyStepOrders(buyCurrentStep + 1, getSortedOrdersForStep(buyCurrentStep, 'buy'), prevOrders);
     }
     
-    // Update button text
-    updateProcessButton();
+    updateBuyProcessButton();
 }
 
 /**
- * Reset demo to initial state
+ * Process the next step of sell limit order book prioritisation
  */
-function resetDemo() {
-    currentStep = 0;
+function processSellLimitOrderBook() {
+    if (sellDemoOrders.length === 0) {
+        loadSellSampleOrders();
+        return;
+    }
     
-    // Hide all columns and arrows except column 1
+    // If we're at the last step, reset
+    if (sellCurrentStep >= STEPS.TIME) {
+        resetSellDemo();
+        return;
+    }
+    
+    // Get previous step's order for comparison
+    const prevOrders = getSortedOrdersForStep(sellCurrentStep, 'sell');
+    
+    // Move to next step
+    sellCurrentStep++;
+    
+    // Show the arrow before the new column
+    const arrow = document.getElementById(`sellArrow${sellCurrentStep}`);
+    if (arrow) arrow.style.display = 'flex';
+    
+    // Show the new column
+    const stepCol = document.getElementById(`sellStepCol${sellCurrentStep + 1}`);
+    if (stepCol) {
+        stepCol.style.display = 'block';
+        populateSellStepOrders(sellCurrentStep + 1, getSortedOrdersForStep(sellCurrentStep, 'sell'), prevOrders);
+    }
+    
+    updateSellProcessButton();
+}
+
+/**
+ * Reset buy demo to initial state
+ */
+function resetBuyDemo() {
+    buyCurrentStep = 0;
+    
     for (let i = 2; i <= 4; i++) {
-        const col = document.getElementById(`stepCol${i}`);
+        const col = document.getElementById(`buyStepCol${i}`);
         if (col) col.style.display = 'none';
-        const arrow = document.getElementById(`arrow${i - 1}`);
+        const arrow = document.getElementById(`buyArrow${i - 1}`);
         if (arrow) arrow.style.display = 'none';
     }
     
-    // Update button
-    updateProcessButton();
+    updateBuyProcessButton();
+}
+
+/**
+ * Reset sell demo to initial state
+ */
+function resetSellDemo() {
+    sellCurrentStep = 0;
+    
+    for (let i = 2; i <= 4; i++) {
+        const col = document.getElementById(`sellStepCol${i}`);
+        if (col) col.style.display = 'none';
+        const arrow = document.getElementById(`sellArrow${i - 1}`);
+        if (arrow) arrow.style.display = 'none';
+    }
+    
+    updateSellProcessButton();
 }
 
 /**
@@ -360,13 +465,17 @@ function resetDemo() {
  */
 function clearOrderBook() {
     orderBook.clear();
-    demoOrders = [];
-    currentStep = 0;
+    buyDemoOrders = [];
+    sellDemoOrders = [];
+    buyCurrentStep = 0;
+    sellCurrentStep = 0;
     
-    // Hide all steps
+    // Hide all steps for buy section
     for (let i = 1; i <= 4; i++) {
-        const container = document.getElementById(`ordersStep${i}`);
-        if (container) container.innerHTML = '';
+        const buyContainer = document.getElementById(`buyOrdersStep${i}`);
+        if (buyContainer) buyContainer.innerHTML = '';
+        const sellContainer = document.getElementById(`sellOrdersStep${i}`);
+        if (sellContainer) sellContainer.innerHTML = '';
     }
     
     updateUI();
