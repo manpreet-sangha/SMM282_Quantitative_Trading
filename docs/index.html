@@ -42,7 +42,35 @@
 
         <div class="main-content">
             <div class="order-form-section">
-                <h2>📝 Submit Order</h2>
+                <h2>📝 Demo Controls</h2>
+                
+                <div class="quick-actions">
+                    <button class="btn btn-secondary" onclick="loadSampleOrders()">Load Sample Orders</button>
+                    <button class="btn btn-primary btn-large" onclick="processLimitOrderBook()">▶ Process Limit Order Book</button>
+                    <button class="btn btn-secondary" onclick="resetDemo()">Reset to Arrival Order</button>
+                    <button class="btn btn-danger" onclick="clearOrderBook()">Clear All</button>
+                </div>
+
+                <div class="demo-section">
+                    <h2 id="stepTitle">Limit Order Processing Demo</h2>
+                    <p id="stepDescription" class="step-description">Load sample orders to see how buy orders are prioritised.</p>
+                    
+                    <div class="demo-order-table">
+                        <div class="demo-header">
+                            <span>Limit Price</span>
+                            <span>Visibility</span>
+                            <span>Time</span>
+                            <span>Trader Number</span>
+                        </div>
+                        <div id="demoOrdersContainer" class="demo-orders">
+                            <div class="demo-empty">Click "Load Sample Orders" to begin</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <h2>📝 Submit Custom Order</h2>
                 <form id="orderForm" class="order-form">
                     <div class="form-group">
                         <label for="orderId">Order ID</label>
@@ -71,12 +99,6 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Submit Order</button>
                 </form>
-
-                <div class="quick-actions">
-                    <h3>Quick Actions</h3>
-                    <button class="btn btn-secondary" onclick="loadSampleOrders()">Load Sample Orders</button>
-                    <button class="btn btn-danger" onclick="clearOrderBook()">Clear Order Book</button>
-                </div>
             </div>
 
             <div class="order-book-section">

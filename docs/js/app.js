@@ -7,6 +7,17 @@
 let orderBook;
 let visualizer;
 
+// Demo state for step-by-step processing
+let demoOrders = [];
+let currentStep = 0;
+const STEPS = {
+    ARRIVAL: 0,
+    PRICE: 1,
+    VISIBILITY: 2,
+    TIME: 3
+};
+let stepNames = ['Orders by Arrival Time', 'Prioritisation by Price', 'Prioritisation by Price, Visibility', 'Prioritisation by Price, Visibility, Time'];
+
 /**
  * Initialize the application
  */
@@ -55,55 +66,144 @@ function handleOrderSubmit(event) {
  */
 function loadSampleOrders() {
     orderBook.clear();
+    currentStep = 0;
     
-    // Sample bid orders at different prices
-    const sampleBids = [
-        { price: 99.00, qty: 100, visible: true },
-        { price: 99.25, qty: 150, visible: true },
-        { price: 99.50, qty: 200, visible: true },
-        { price: 99.50, qty: 100, visible: true },  // Same price, time priority
-        { price: 99.50, qty: 75, visible: false },  // Hidden order
-        { price: 99.75, qty: 180, visible: true },
-        { price: 98.50, qty: 250, visible: true },
+    // Sample orders matching the lecture example (Buy orders)
+    // These will be shown in arrival order first, then sorted step by step
+    demoOrders = [
+        { price: 32.01, visible: false, time: '10:00', trader: 5, arrivalOrder: 0 },
+        { price: 34.05, visible: true,  time: '10:01', trader: 3, arrivalOrder: 1 },
+        { price: 32.01, visible: true,  time: '10:02', trader: 2, arrivalOrder: 2 },
+        { price: 33.05, visible: true,  time: '10:11', trader: 1, arrivalOrder: 3 },
+        { price: 35.22, visible: true,  time: '10:13', trader: 6, arrivalOrder: 4 },
+        { price: 35.33, visible: false, time: '10:21', trader: 4, arrivalOrder: 5 },
+        { price: 33.05, visible: true,  time: '10:22', trader: 7, arrivalOrder: 6 },
     ];
     
-    // Sample ask orders at different prices
-    const sampleAsks = [
-        { price: 100.25, qty: 120, visible: true },
-        { price: 100.50, qty: 150, visible: true },
-        { price: 100.50, qty: 80, visible: true },
-        { price: 100.50, qty: 50, visible: false }, // Hidden order
-        { price: 100.75, qty: 200, visible: true },
-        { price: 101.00, qty: 175, visible: true },
-        { price: 101.50, qty: 300, visible: true },
-    ];
-    
-    // Submit bids
-    for (const bid of sampleBids) {
-        const order = new Order(
-            orderBook.generateOrderId(),
-            Side.BUY,
-            bid.price,
-            bid.qty,
-            bid.visible
-        );
-        orderBook.submitOrder(order);
+    updateDemoDisplay();
+    console.log('Sample orders loaded - Click "Process Limit Order Book" to see prioritisation');
+}
+
+/**
+ * Process the next step of limit order book prioritisation
+ */
+function processLimitOrderBook() {
+    if (demoOrders.length === 0) {
+        alert('Please load sample orders first!');
+        return;
     }
     
-    // Submit asks
-    for (const ask of sampleAsks) {
-        const order = new Order(
-            orderBook.generateOrderId(),
-            Side.SELL,
-            ask.price,
-            ask.qty,
-            ask.visible
-        );
-        orderBook.submitOrder(order);
+    currentStep++;
+    if (currentStep > STEPS.TIME) {
+        currentStep = STEPS.ARRIVAL;
     }
     
-    updateUI();
-    console.log('Sample orders loaded');
+    updateDemoDisplay();
+}
+
+/**
+ * Sort orders based on current step
+ */
+function getSortedOrders() {
+    let sorted = [...demoOrders];
+    
+    switch (currentStep) {
+        case STEPS.ARRIVAL:
+            // Sort by arrival order
+            sorted.sort((a, b) => a.arrivalOrder - b.arrivalOrder);
+            break;
+            
+        case STEPS.PRICE:
+            // Sort by price (highest first for buy orders)
+            sorted.sort((a, b) => b.price - a.price);
+            break;
+            
+        case STEPS.VISIBILITY:
+            // Sort by price, then visibility (visible first)
+            sorted.sort((a, b) => {
+                if (a.price !== b.price) return b.price - a.price;
+                if (a.visible !== b.visible) return a.visible ? -1 : 1;
+                return 0;
+            });
+            break;
+            
+        case STEPS.TIME:
+            // Sort by price, then visibility, then time
+            sorted.sort((a, b) => {
+                if (a.price !== b.price) return b.price - a.price;
+                if (a.visible !== b.visible) return a.visible ? -1 : 1;
+                return a.time.localeCompare(b.time);
+            });
+            break;
+    }
+    
+    return sorted;
+}
+
+/**
+ * Update the demo display with animation
+ */
+function updateDemoDisplay() {
+    const container = document.getElementById('demoOrdersContainer');
+    if (!container) return;
+    
+    const sorted = getSortedOrders();
+    const stepTitle = document.getElementById('stepTitle');
+    const stepDescription = document.getElementById('stepDescription');
+    
+    if (stepTitle) {
+        stepTitle.textContent = `(${currentStep + 1}) ${stepNames[currentStep]}`;
+    }
+    
+    if (stepDescription) {
+        const descriptions = [
+            'Orders displayed in the sequence they arrived at the exchange.',
+            'Orders sorted by limit price. Higher prices get priority for buy orders.',
+            'At each price level, visible orders get priority over hidden orders.',
+            'At same price and visibility, earlier orders get priority (FIFO).'
+        ];
+        stepDescription.textContent = descriptions[currentStep];
+    }
+    
+    // Create new rows with animation
+    container.innerHTML = '';
+    
+    sorted.forEach((order, index) => {
+        const row = document.createElement('div');
+        row.className = 'demo-order-row';
+        row.style.animationDelay = `${index * 0.1}s`;
+        
+        // Highlight rows that demonstrate the current sorting principle
+        let highlight = '';
+        if (currentStep === STEPS.TIME && order.price === 33.05 && order.visible) {
+            highlight = 'highlight-time';
+        } else if (currentStep === STEPS.VISIBILITY && order.price === 32.01) {
+            highlight = 'highlight-visibility';
+        }
+        
+        row.innerHTML = `
+            <span class="demo-price">${order.price.toFixed(2)}</span>
+            <span class="demo-visibility ${order.visible ? 'visible' : 'hidden'}">${order.visible ? 'Visible' : 'Hidden'}</span>
+            <span class="demo-time">${order.time}</span>
+            <span class="demo-trader">${order.trader}</span>
+        `;
+        
+        if (highlight) {
+            row.classList.add(highlight);
+        }
+        
+        container.appendChild(row);
+    });
+}
+
+/**
+ * Reset demo to initial state
+ */
+function resetDemo() {
+    currentStep = 0;
+    if (demoOrders.length > 0) {
+        updateDemoDisplay();
+    }
 }
 
 /**
@@ -111,6 +211,24 @@ function loadSampleOrders() {
  */
 function clearOrderBook() {
     orderBook.clear();
+    demoOrders = [];
+    currentStep = 0;
+    
+    const container = document.getElementById('demoOrdersContainer');
+    if (container) {
+        container.innerHTML = '<div class="demo-empty">Click "Load Sample Orders" to begin</div>';
+    }
+    
+    const stepTitle = document.getElementById('stepTitle');
+    if (stepTitle) {
+        stepTitle.textContent = 'Limit Order Processing Demo';
+    }
+    
+    const stepDescription = document.getElementById('stepDescription');
+    if (stepDescription) {
+        stepDescription.textContent = 'Load sample orders to see how buy orders are prioritised.';
+    }
+    
     updateUI();
     console.log('Order book cleared');
 }

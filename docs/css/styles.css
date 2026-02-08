@@ -518,6 +518,141 @@ footer a:hover {
     animation: flash-red 0.5s ease-out;
 }
 
+/* Demo Section Styles */
+.demo-section {
+    margin-top: 25px;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    border: 2px solid var(--accent-blue);
+}
+
+.demo-section h2 {
+    color: var(--accent-blue);
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+}
+
+.step-description {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.demo-order-table {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.demo-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 12px 15px;
+    background: var(--accent-blue);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.demo-orders {
+    min-height: 250px;
+}
+
+.demo-order-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.95rem;
+    animation: slideIn 0.4s ease-out forwards;
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.demo-order-row:last-child {
+    border-bottom: none;
+}
+
+.demo-order-row:nth-child(even) {
+    background: var(--bg-secondary);
+}
+
+.demo-price {
+    font-weight: 700;
+    color: var(--bid-color);
+}
+
+.demo-visibility.visible {
+    color: var(--accent-green);
+    font-weight: 600;
+}
+
+.demo-visibility.hidden {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.demo-time {
+    color: var(--text-primary);
+}
+
+.demo-trader {
+    font-weight: 600;
+    color: var(--accent-blue);
+}
+
+.demo-empty {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Highlight animations */
+.highlight-time {
+    background: rgba(9, 105, 218, 0.15) !important;
+    border-left: 3px solid var(--accent-blue);
+}
+
+.highlight-visibility {
+    background: rgba(26, 127, 55, 0.15) !important;
+    border-left: 3px solid var(--accent-green);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.btn-large {
+    padding: 15px 25px;
+    font-size: 1.1rem;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.section-divider {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid var(--border-color);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .main-content {
@@ -540,5 +675,11 @@ footer a:hover {
     
     header h1 {
         font-size: 1.8rem;
+    }
+    
+    .demo-header,
+    .demo-order-row {
+        grid-template-columns: 1fr 1fr;
+        font-size: 0.85rem;
     }
 }
