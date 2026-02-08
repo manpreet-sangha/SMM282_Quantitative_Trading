@@ -674,6 +674,121 @@ footer a:hover {
     font-size: 1.3rem;
 }
 
+/* Stacked Steps Container */
+.steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.step-block {
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.step-block-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.step-block-header.step-active {
+    background: linear-gradient(135deg, rgba(9, 105, 218, 0.1), rgba(26, 127, 55, 0.1));
+    border-bottom: 2px solid var(--accent-blue);
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--accent-blue);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.step-info h3 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.step-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Step Connector (arrow between steps) */
+.step-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+.connector-line {
+    width: 3px;
+    height: 20px;
+    background: var(--accent-blue);
+}
+
+.connector-arrow {
+    font-size: 1.5rem;
+    color: var(--accent-blue);
+    line-height: 1;
+}
+
+.connector-label {
+    margin-top: 8px;
+    padding: 6px 16px;
+    background: var(--accent-blue);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Final Result Styling */
+.final-result {
+    border: 2px solid var(--accent-green);
+}
+
+.final-result .demo-table-header {
+    background: var(--accent-green);
+}
+
+.final-note {
+    padding: 15px 20px;
+    background: rgba(26, 127, 55, 0.1);
+    border-top: 1px solid var(--accent-green);
+    color: var(--accent-green);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .step-description {
     color: var(--text-secondary);
     margin-bottom: 20px;
@@ -700,7 +815,7 @@ footer a:hover {
 }
 
 .demo-orders {
-    min-height: 280px;
+    min-height: auto;
 }
 
 .demo-order-row {

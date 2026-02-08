@@ -107,46 +107,41 @@ function loadSampleOrders() {
         { price: 33.05, visible: true,  time: '10:22', trader: 7, arrivalOrder: 6 },
     ];
     
-    updateDemoDisplay();
-    console.log('Sample orders loaded - Click "Process Limit Order Book" to see prioritisation');
+    // Hide all step blocks except step 1
+    for (let i = 2; i <= 4; i++) {
+        const block = document.getElementById(`stepBlock${i}`);
+        if (block) block.style.display = 'none';
+    }
+    
+    // Show step 1 and populate it
+    const step1Block = document.getElementById('stepBlock1');
+    if (step1Block) step1Block.style.display = 'block';
+    
+    // Populate step 1 with arrival order
+    populateStepOrders(1, getSortedOrdersForStep(0));
+    
+    // Update button
+    updateProcessButton();
+    
+    console.log('Sample orders loaded - Click button to see each prioritisation step');
 }
 
 /**
- * Process the next step of limit order book prioritisation
+ * Get sorted orders for a specific step
  */
-function processLimitOrderBook() {
-    if (demoOrders.length === 0) {
-        alert('Please load sample orders first!');
-        return;
-    }
-    
-    currentStep++;
-    if (currentStep > STEPS.TIME) {
-        currentStep = STEPS.ARRIVAL;
-    }
-    
-    updateDemoDisplay();
-}
-
-/**
- * Sort orders based on current step
- */
-function getSortedOrders() {
+function getSortedOrdersForStep(step) {
     let sorted = [...demoOrders];
     
-    switch (currentStep) {
+    switch (step) {
         case STEPS.ARRIVAL:
-            // Sort by arrival order
             sorted.sort((a, b) => a.arrivalOrder - b.arrivalOrder);
             break;
             
         case STEPS.PRICE:
-            // Sort by price (highest first for buy orders)
             sorted.sort((a, b) => b.price - a.price);
             break;
             
         case STEPS.VISIBILITY:
-            // Sort by price, then visibility (visible first)
             sorted.sort((a, b) => {
                 if (a.price !== b.price) return b.price - a.price;
                 if (a.visible !== b.visible) return a.visible ? -1 : 1;
@@ -155,7 +150,6 @@ function getSortedOrders() {
             break;
             
         case STEPS.TIME:
-            // Sort by price, then visibility, then time
             sorted.sort((a, b) => {
                 if (a.price !== b.price) return b.price - a.price;
                 if (a.visible !== b.visible) return a.visible ? -1 : 1;
@@ -168,70 +162,18 @@ function getSortedOrders() {
 }
 
 /**
- * Update the demo display with animation
+ * Populate orders for a specific step container
  */
-function updateDemoDisplay() {
-    const container = document.getElementById('demoOrdersContainer');
+function populateStepOrders(stepNum, orders) {
+    const container = document.getElementById(`ordersStep${stepNum}`);
     if (!container) return;
     
-    const sorted = getSortedOrders();
-    const stepTitle = document.getElementById('stepTitle');
-    const stepDescription = document.getElementById('stepDescription');
-    
-    // Update step title
-    if (stepTitle) {
-        stepTitle.textContent = `(${currentStep + 1}) ${stepNames[currentStep]}`;
-    }
-    
-    // Update step description
-    if (stepDescription) {
-        const descriptions = [
-            'Orders displayed in the sequence they arrived at the exchange.',
-            'Orders sorted by limit price. Higher prices get priority for buy orders.',
-            'At each price level, visible orders get priority over hidden orders.',
-            'At same price and visibility, earlier orders get priority (FIFO).'
-        ];
-        stepDescription.textContent = descriptions[currentStep];
-    }
-    
-    // Update step indicators
-    for (let i = 1; i <= 4; i++) {
-        const stepEl = document.getElementById(`step${i}`);
-        if (stepEl) {
-            stepEl.classList.remove('active', 'completed');
-            if (i === currentStep + 1) {
-                stepEl.classList.add('active');
-            } else if (i < currentStep + 1) {
-                stepEl.classList.add('completed');
-            }
-        }
-    }
-    
-    // Update process button text
-    const processBtn = document.getElementById('processBtn');
-    if (processBtn) {
-        if (currentStep === STEPS.TIME) {
-            processBtn.textContent = '↺ Start Over';
-        } else {
-            processBtn.textContent = '▶ Process Limit Order Book';
-        }
-    }
-    
-    // Create new rows with animation
     container.innerHTML = '';
     
-    sorted.forEach((order, index) => {
+    orders.forEach((order, index) => {
         const row = document.createElement('div');
         row.className = 'demo-order-row';
-        row.style.animationDelay = `${index * 0.08}s`;
-        
-        // Highlight rows that demonstrate the current sorting principle
-        let highlight = '';
-        if (currentStep === STEPS.TIME && order.price === 33.05 && order.visible) {
-            highlight = 'highlight-time';
-        } else if (currentStep === STEPS.VISIBILITY && order.price === 32.01) {
-            highlight = 'highlight-visibility';
-        }
+        row.style.animationDelay = `${index * 0.06}s`;
         
         row.innerHTML = `
             <span class="demo-price">${order.price.toFixed(2)}</span>
@@ -240,12 +182,59 @@ function updateDemoDisplay() {
             <span class="demo-trader">${order.trader}</span>
         `;
         
-        if (highlight) {
-            row.classList.add(highlight);
-        }
-        
         container.appendChild(row);
     });
+}
+
+/**
+ * Update the process button text based on current step
+ */
+function updateProcessButton() {
+    const processBtn = document.getElementById('processBtn');
+    if (!processBtn) return;
+    
+    const buttonTexts = [
+        '▶ Next Step: Apply Price Priority',
+        '▶ Next Step: Apply Visibility Priority',
+        '▶ Next Step: Apply Time Priority (FIFO)',
+        '↺ Start Over'
+    ];
+    
+    processBtn.textContent = buttonTexts[currentStep];
+}
+
+/**
+ * Process the next step of limit order book prioritisation
+ */
+function processLimitOrderBook() {
+    if (demoOrders.length === 0) {
+        alert('Please load sample orders first!');
+        return;
+    }
+    
+    // If we're at the last step, reset
+    if (currentStep >= STEPS.TIME) {
+        resetDemo();
+        return;
+    }
+    
+    // Move to next step
+    currentStep++;
+    
+    // Show the new step block with animation
+    const stepBlock = document.getElementById(`stepBlock${currentStep + 1}`);
+    if (stepBlock) {
+        stepBlock.style.display = 'block';
+        // Populate with sorted orders for this step
+        populateStepOrders(currentStep + 1, getSortedOrdersForStep(currentStep));
+        // Scroll to the new block
+        setTimeout(() => {
+            stepBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
+    
+    // Update button text
+    updateProcessButton();
 }
 
 /**
@@ -253,9 +242,21 @@ function updateDemoDisplay() {
  */
 function resetDemo() {
     currentStep = 0;
-    if (demoOrders.length > 0) {
-        updateDemoDisplay();
+    
+    // Hide all step blocks except step 1
+    for (let i = 2; i <= 4; i++) {
+        const block = document.getElementById(`stepBlock${i}`);
+        if (block) block.style.display = 'none';
     }
+    
+    // Scroll back to top
+    const step1Block = document.getElementById('stepBlock1');
+    if (step1Block) {
+        step1Block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Update button
+    updateProcessButton();
 }
 
 /**
@@ -266,19 +267,10 @@ function clearOrderBook() {
     demoOrders = [];
     currentStep = 0;
     
-    const container = document.getElementById('demoOrdersContainer');
-    if (container) {
-        container.innerHTML = '<div class="demo-empty">Click "Load Sample Orders" to begin</div>';
-    }
-    
-    const stepTitle = document.getElementById('stepTitle');
-    if (stepTitle) {
-        stepTitle.textContent = 'Limit Order Processing Demo';
-    }
-    
-    const stepDescription = document.getElementById('stepDescription');
-    if (stepDescription) {
-        stepDescription.textContent = 'Load sample orders to see how buy orders are prioritised.';
+    // Hide all steps
+    for (let i = 1; i <= 4; i++) {
+        const container = document.getElementById(`ordersStep${i}`);
+        if (container) container.innerHTML = '';
     }
     
     updateUI();

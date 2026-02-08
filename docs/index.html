@@ -67,30 +67,109 @@
 
                 <div class="demo-controls">
                     <button class="btn btn-primary btn-large" onclick="processLimitOrderBook()" id="processBtn">
-                        ▶ Process Limit Order Book
+                        ▶ Next Step: Apply Price Priority
                     </button>
-                    <button class="btn btn-secondary" onclick="resetDemo()">↺ Reset to Step 1</button>
+                    <button class="btn btn-secondary" onclick="resetDemo()">↺ Reset</button>
                 </div>
 
-                <div class="step-indicator">
-                    <div class="step" id="step1"><span>1</span> Arrival Time</div>
-                    <div class="step" id="step2"><span>2</span> Price</div>
-                    <div class="step" id="step3"><span>3</span> Visibility</div>
-                    <div class="step" id="step4"><span>4</span> Time (FIFO)</div>
-                </div>
-
-                <div class="demo-section">
-                    <h2 id="stepTitle">(1) Orders by Arrival Time</h2>
-                    <p id="stepDescription" class="step-description">Orders displayed in the sequence they arrived at the exchange.</p>
-                    
-                    <div class="demo-order-table">
-                        <div class="demo-table-header">
-                            <span>Limit Price</span>
-                            <span>Visibility</span>
-                            <span>Time</span>
-                            <span>Trader Number</span>
+                <!-- All steps will be shown stacked here -->
+                <div id="stepsContainer" class="steps-container">
+                    <!-- Step 1: Arrival Order (always visible first) -->
+                    <div class="step-block" id="stepBlock1">
+                        <div class="step-block-header">
+                            <div class="step-number">1</div>
+                            <div class="step-info">
+                                <h3>Orders by Arrival Time</h3>
+                                <p>Orders displayed in the sequence they arrived at the exchange.</p>
+                            </div>
                         </div>
-                        <div id="demoOrdersContainer" class="demo-orders"></div>
+                        <div class="demo-order-table">
+                            <div class="demo-table-header">
+                                <span>Limit Price</span>
+                                <span>Visibility</span>
+                                <span>Time</span>
+                                <span>Trader Number</span>
+                            </div>
+                            <div id="ordersStep1" class="demo-orders"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Price Priority (hidden initially) -->
+                    <div class="step-block" id="stepBlock2" style="display: none;">
+                        <div class="step-connector">
+                            <div class="connector-line"></div>
+                            <div class="connector-arrow">▼</div>
+                            <div class="connector-label">Sort by Price (Highest First)</div>
+                        </div>
+                        <div class="step-block-header step-active">
+                            <div class="step-number">2</div>
+                            <div class="step-info">
+                                <h3>Prioritisation by Price</h3>
+                                <p>Orders sorted by limit price. Higher prices get priority for buy orders.</p>
+                            </div>
+                        </div>
+                        <div class="demo-order-table">
+                            <div class="demo-table-header">
+                                <span>Limit Price</span>
+                                <span>Visibility</span>
+                                <span>Time</span>
+                                <span>Trader Number</span>
+                            </div>
+                            <div id="ordersStep2" class="demo-orders"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Visibility Priority (hidden initially) -->
+                    <div class="step-block" id="stepBlock3" style="display: none;">
+                        <div class="step-connector">
+                            <div class="connector-line"></div>
+                            <div class="connector-arrow">▼</div>
+                            <div class="connector-label">At Same Price → Visible Orders First</div>
+                        </div>
+                        <div class="step-block-header step-active">
+                            <div class="step-number">3</div>
+                            <div class="step-info">
+                                <h3>Prioritisation by Price, Visibility</h3>
+                                <p>At each price level, visible orders get priority over hidden orders.</p>
+                            </div>
+                        </div>
+                        <div class="demo-order-table">
+                            <div class="demo-table-header">
+                                <span>Limit Price</span>
+                                <span>Visibility</span>
+                                <span>Time</span>
+                                <span>Trader Number</span>
+                            </div>
+                            <div id="ordersStep3" class="demo-orders"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Time Priority (hidden initially) -->
+                    <div class="step-block" id="stepBlock4" style="display: none;">
+                        <div class="step-connector">
+                            <div class="connector-line"></div>
+                            <div class="connector-arrow">▼</div>
+                            <div class="connector-label">At Same Price & Visibility → Earlier Time First (FIFO)</div>
+                        </div>
+                        <div class="step-block-header step-active">
+                            <div class="step-number">4</div>
+                            <div class="step-info">
+                                <h3>Prioritisation by Price, Visibility, Time</h3>
+                                <p>At same price and visibility, earlier orders get priority (FIFO).</p>
+                            </div>
+                        </div>
+                        <div class="demo-order-table final-result">
+                            <div class="demo-table-header">
+                                <span>Limit Price</span>
+                                <span>Visibility</span>
+                                <span>Time</span>
+                                <span>Trader Number</span>
+                            </div>
+                            <div id="ordersStep4" class="demo-orders"></div>
+                        </div>
+                        <div class="final-note">
+                            ✅ <strong>Final Order Book Priority:</strong> Orders are now arranged in the sequence they would be matched against incoming sell orders.
+                        </div>
                     </div>
                 </div>
             </div>
