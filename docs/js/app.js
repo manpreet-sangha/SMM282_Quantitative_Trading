@@ -175,14 +175,17 @@ function populateStepOrders(stepNum, orders, prevOrders = null) {
         });
     }
     
+    // Step 4 (final) doesn't show movement column
+    const showMovement = stepNum !== 4 && prevOrders !== null;
+    
     orders.forEach((order, index) => {
         const row = document.createElement('div');
         row.className = 'compact-row';
         row.style.animationDelay = `${index * 0.04}s`;
         
-        // Calculate movement
+        // Calculate movement (only for steps 2-3)
         let movementHtml = '';
-        if (prevOrders) {
+        if (showMovement) {
             const prevPos = prevPositions[order.trader];
             const movement = prevPos - index; // positive = moved up, negative = moved down
             
