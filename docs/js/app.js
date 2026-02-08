@@ -10,6 +10,8 @@ let visualizer;
 // Demo state for step-by-step processing
 let demoOrders = [];
 let currentStep = 0;
+let currentOrderType = 'buy'; // 'buy' or 'sell'
+
 const STEPS = {
     ARRIVAL: 0,
     PRICE: 1,
@@ -17,6 +19,28 @@ const STEPS = {
     TIME: 3
 };
 let stepNames = ['Orders by Arrival Time', 'Prioritisation by Price', 'Prioritisation by Price, Visibility', 'Prioritisation by Price, Visibility, Time'];
+
+// Sample Buy Orders (from lecture)
+const BUY_ORDERS = [
+    { price: 32.01, visible: false, time: '10:00', trader: 5, arrivalOrder: 0 },
+    { price: 34.05, visible: true,  time: '10:01', trader: 3, arrivalOrder: 1 },
+    { price: 32.01, visible: true,  time: '10:02', trader: 2, arrivalOrder: 2 },
+    { price: 33.05, visible: true,  time: '10:11', trader: 1, arrivalOrder: 3 },
+    { price: 35.22, visible: true,  time: '10:13', trader: 6, arrivalOrder: 4 },
+    { price: 35.33, visible: false, time: '10:21', trader: 4, arrivalOrder: 5 },
+    { price: 33.05, visible: true,  time: '10:22', trader: 7, arrivalOrder: 6 },
+];
+
+// Sample Sell Orders (from lecture slide)
+const SELL_ORDERS = [
+    { price: 38.56, visible: true,  time: '10:02', trader: 10, arrivalOrder: 0 },
+    { price: 36.19, visible: false, time: '10:05', trader: 12, arrivalOrder: 1 },
+    { price: 36.93, visible: true,  time: '10:11', trader: 9,  arrivalOrder: 2 },
+    { price: 36.93, visible: true,  time: '10:13', trader: 8,  arrivalOrder: 3 },
+    { price: 40.02, visible: true,  time: '10:14', trader: 13, arrivalOrder: 4 },
+    { price: 37.66, visible: false, time: '10:20', trader: 11, arrivalOrder: 5 },
+    { price: 37.66, visible: true,  time: '10:21', trader: 14, arrivalOrder: 6 },
+];
 
 /**
  * Initialize the application
@@ -89,22 +113,50 @@ function handleOrderSubmit(event) {
 }
 
 /**
+ * Switch between Buy and Sell order types
+ */
+function switchOrderType(type) {
+    currentOrderType = type;
+    
+    // Update toggle buttons
+    const btnBuy = document.getElementById('btnBuyOrders');
+    const btnSell = document.getElementById('btnSellOrders');
+    const stepsContainer = document.getElementById('stepsContainer');
+    
+    if (type === 'buy') {
+        btnBuy.classList.add('active');
+        btnBuy.classList.remove('sell-active');
+        btnSell.classList.remove('active', 'sell-active');
+        if (stepsContainer) stepsContainer.classList.remove('sell-mode');
+    } else {
+        btnSell.classList.add('active', 'sell-active');
+        btnBuy.classList.remove('active');
+        if (stepsContainer) stepsContainer.classList.add('sell-mode');
+    }
+    
+    // Update title
+    const title = document.getElementById('demoTitle');
+    if (title) {
+        title.textContent = type === 'buy' 
+            ? '📋 Limit Order Processing - Buy Orders Priority Rules'
+            : '📋 Limit Order Processing - Sell Orders Priority Rules';
+    }
+    
+    // Reload sample orders with new type
+    loadSampleOrders();
+}
+
+/**
  * Load sample orders to demonstrate the matching engine
  */
 function loadSampleOrders() {
     orderBook.clear();
     currentStep = 0;
     
-    // Sample orders matching the lecture example (Buy orders)
-    demoOrders = [
-        { price: 32.01, visible: false, time: '10:00', trader: 5, arrivalOrder: 0 },
-        { price: 34.05, visible: true,  time: '10:01', trader: 3, arrivalOrder: 1 },
-        { price: 32.01, visible: true,  time: '10:02', trader: 2, arrivalOrder: 2 },
-        { price: 33.05, visible: true,  time: '10:11', trader: 1, arrivalOrder: 3 },
-        { price: 35.22, visible: true,  time: '10:13', trader: 6, arrivalOrder: 4 },
-        { price: 35.33, visible: false, time: '10:21', trader: 4, arrivalOrder: 5 },
-        { price: 33.05, visible: true,  time: '10:22', trader: 7, arrivalOrder: 6 },
-    ];
+    // Load orders based on current type
+    demoOrders = currentOrderType === 'buy' 
+        ? [...BUY_ORDERS] 
+        : [...SELL_ORDERS];
     
     // Hide all columns and arrows except column 1
     for (let i = 2; i <= 4; i++) {
@@ -117,17 +169,26 @@ function loadSampleOrders() {
     // Populate step 1 with arrival order (no movement column)
     populateStepOrders(1, getSortedOrdersForStep(0));
     
+    // Update arrow label for price direction
+    const arrow1Label = document.querySelector('#arrow1 .arrow-label');
+    if (arrow1Label) {
+        arrow1Label.textContent = currentOrderType === 'buy' ? 'Price ↓' : 'Price ↑';
+    }
+    
     // Update button
     updateProcessButton();
     
-    console.log('Sample orders loaded - Click button to see each prioritisation step');
+    console.log(`${currentOrderType.toUpperCase()} orders loaded - Click button to see each prioritisation step`);
 }
 
 /**
  * Get sorted orders for a specific step
+ * Buy orders: higher prices get priority
+ * Sell orders: lower prices get priority
  */
 function getSortedOrdersForStep(step) {
     let sorted = [...demoOrders];
+    const isBuy = currentOrderType === 'buy';
     
     switch (step) {
         case STEPS.ARRIVAL:
@@ -135,12 +196,16 @@ function getSortedOrdersForStep(step) {
             break;
             
         case STEPS.PRICE:
-            sorted.sort((a, b) => b.price - a.price);
+            // Buy: higher price first, Sell: lower price first
+            sorted.sort((a, b) => isBuy ? b.price - a.price : a.price - b.price);
             break;
             
         case STEPS.VISIBILITY:
             sorted.sort((a, b) => {
-                if (a.price !== b.price) return b.price - a.price;
+                // Price priority
+                const priceCompare = isBuy ? b.price - a.price : a.price - b.price;
+                if (a.price !== b.price) return priceCompare;
+                // Visibility priority (visible first)
                 if (a.visible !== b.visible) return a.visible ? -1 : 1;
                 return 0;
             });
@@ -148,8 +213,12 @@ function getSortedOrdersForStep(step) {
             
         case STEPS.TIME:
             sorted.sort((a, b) => {
-                if (a.price !== b.price) return b.price - a.price;
+                // Price priority
+                const priceCompare = isBuy ? b.price - a.price : a.price - b.price;
+                if (a.price !== b.price) return priceCompare;
+                // Visibility priority
                 if (a.visible !== b.visible) return a.visible ? -1 : 1;
+                // Time priority (earlier first)
                 return a.time.localeCompare(b.time);
             });
             break;

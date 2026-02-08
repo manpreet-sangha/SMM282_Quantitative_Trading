@@ -61,8 +61,18 @@
             <!-- Sample Orders Demo Section -->
             <div class="demo-panel" id="sampleDemo" style="display: none;">
                 <div class="demo-header-bar">
-                    <h2>📋 Limit Order Processing - Buy Orders Priority Rules</h2>
+                    <h2 id="demoTitle">📋 Limit Order Processing - Buy Orders Priority Rules</h2>
                     <button class="btn btn-secondary btn-small" onclick="backToModeSelection()">← Back</button>
+                </div>
+
+                <!-- Order Type Toggle -->
+                <div class="order-type-toggle">
+                    <button class="btn-toggle active" id="btnBuyOrders" onclick="switchOrderType('buy')">
+                        <span class="toggle-icon">📈</span> Buy Orders
+                    </button>
+                    <button class="btn-toggle" id="btnSellOrders" onclick="switchOrderType('sell')">
+                        <span class="toggle-icon">📉</span> Sell Orders
+                    </button>
                 </div>
 
                 <div class="demo-controls">

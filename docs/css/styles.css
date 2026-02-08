@@ -197,6 +197,49 @@ header h1 {
     font-size: 1.3rem;
 }
 
+/* Order Type Toggle */
+.order-type-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-toggle:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+.btn-toggle.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+}
+
+.btn-toggle.active.sell-active {
+    background: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+.toggle-icon {
+    font-size: 1.1rem;
+}
+
 .demo-controls {
     display: flex;
     gap: 15px;
@@ -838,6 +881,11 @@ footer a:hover {
 .cell-price {
     font-weight: 700;
     color: var(--bid-color);
+}
+
+/* Sell orders use red color for price */
+.sell-mode .cell-price {
+    color: var(--ask-color);
 }
 
 .cell-vis {
