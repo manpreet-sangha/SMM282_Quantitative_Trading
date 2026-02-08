@@ -2,15 +2,24 @@
 
 A collection of simulations and implementations covering key concepts from the Quantitative Trading module.
 
+## 🌐 Live Demo
+
+**[View the Order Book Simulator](https://manpreet.github.io/SMM282_Quantitative_Trading/)**
+
+Interactive web-based visualization of the limit order book matching engine.
+
 ## Project Structure
 
 ```
 SMM282_Quantitative_Trading/
 ├── simulations/
-│   ├── order_book/           # Order book and matching engine simulations
+│   ├── order_book/           # Order book and matching engine simulations (Python)
 │   └── ...
 ├── tests/                    # Unit tests
-└── docs/                     # Documentation
+└── docs/                     # Web visualization (GitHub Pages)
+    ├── index.html            # Main web interface
+    ├── css/                  # Styles
+    └── js/                   # JavaScript implementation
 ```
 
 ## Simulations
@@ -62,6 +71,19 @@ order_book.display()
 ```bash
 pytest tests/
 ```
+
+## Deploying the Web Visualization
+
+The web visualization is hosted via GitHub Pages from the `/docs` folder.
+
+To enable GitHub Pages:
+1. Go to your repository Settings
+2. Navigate to Pages
+3. Under "Source", select "Deploy from a branch"
+4. Select `main` branch and `/docs` folder
+5. Save
+
+The site will be available at: `https://manpreet.github.io/SMM282_Quantitative_Trading/`
 
 ## License
 

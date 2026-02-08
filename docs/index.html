@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limit Order Book Simulator | SMM282 Quantitative Trading</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Limit Order Book Simulator</h1>
+            <p class="subtitle">SMM282 Quantitative Trading - Price-Visibility-Time Priority</p>
+        </header>
+
+        <div class="info-panel">
+            <h3>📚 Matching Priority Rules</h3>
+            <div class="rules">
+                <div class="rule">
+                    <span class="rule-num">1</span>
+                    <div>
+                        <strong>Price First</strong>
+                        <p>Buy orders with higher limit prices get priority. Sell orders with lower limit prices get priority.</p>
+                    </div>
+                </div>
+                <div class="rule">
+                    <span class="rule-num">2</span>
+                    <div>
+                        <strong>Visibility</strong>
+                        <p>Visible orders get priority over hidden orders at the same price level.</p>
+                    </div>
+                </div>
+                <div class="rule">
+                    <span class="rule-num">3</span>
+                    <div>
+                        <strong>Time (FIFO)</strong>
+                        <p>Earlier submitted orders get priority at the same price and visibility.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="order-form-section">
+                <h2>📝 Submit Order</h2>
+                <form id="orderForm" class="order-form">
+                    <div class="form-group">
+                        <label for="orderId">Order ID</label>
+                        <input type="text" id="orderId" placeholder="Auto-generated" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="side">Side</label>
+                        <select id="side">
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" id="price" step="0.01" min="0" value="100.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" min="1" value="100" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="isVisible" checked>
+                            Visible Order
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Order</button>
+                </form>
+
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <button class="btn btn-secondary" onclick="loadSampleOrders()">Load Sample Orders</button>
+                    <button class="btn btn-danger" onclick="clearOrderBook()">Clear Order Book</button>
+                </div>
+            </div>
+
+            <div class="order-book-section">
+                <h2>📖 Order Book</h2>
+                <div class="market-data">
+                    <div class="market-stat">
+                        <span class="label">Best Bid</span>
+                        <span id="bestBid" class="value bid">-</span>
+                    </div>
+                    <div class="market-stat">
+                        <span class="label">Best Ask</span>
+                        <span id="bestAsk" class="value ask">-</span>
+                    </div>
+                    <div class="market-stat">
+                        <span class="label">Spread</span>
+                        <span id="spread" class="value">-</span>
+                    </div>
+                    <div class="market-stat">
+                        <span class="label">Midpoint</span>
+                        <span id="midpoint" class="value">-</span>
+                    </div>
+                </div>
+
+                <div class="order-book-display">
+                    <div class="book-side asks">
+                        <h3>Asks (Sell Orders)</h3>
+                        <div class="book-header">
+                            <span>Price</span>
+                            <span>Quantity</span>
+                            <span>Orders</span>
+                        </div>
+                        <div id="asksContainer" class="book-rows"></div>
+                    </div>
+                    <div class="spread-indicator">
+                        <span>─── SPREAD ───</span>
+                    </div>
+                    <div class="book-side bids">
+                        <h3>Bids (Buy Orders)</h3>
+                        <div class="book-header">
+                            <span>Price</span>
+                            <span>Quantity</span>
+                            <span>Orders</span>
+                        </div>
+                        <div id="bidsContainer" class="book-rows"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="trades-section">
+                <h2>💱 Trade History</h2>
+                <div class="trades-table">
+                    <div class="trades-header">
+                        <span>Trade ID</span>
+                        <span>Buy Order</span>
+                        <span>Sell Order</span>
+                        <span>Price</span>
+                        <span>Quantity</span>
+                        <span>Time</span>
+                    </div>
+                    <div id="tradesContainer" class="trades-rows"></div>
+                </div>
+            </div>
+
+            <div class="orders-section">
+                <h2>📋 All Orders</h2>
+                <div class="orders-table">
+                    <div class="orders-header">
+                        <span>ID</span>
+                        <span>Side</span>
+                        <span>Price</span>
+                        <span>Qty</span>
+                        <span>Filled</span>
+                        <span>Visible</span>
+                        <span>Status</span>
+                        <span>Action</span>
+                    </div>
+                    <div id="ordersContainer" class="orders-rows"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization-section">
+            <h2>📊 Depth Chart</h2>
+            <canvas id="depthChart"></canvas>
+        </div>
+
+        <footer>
+            <p>SMM282 Quantitative Trading | City St George's, University of London</p>
+            <p><a href="https://github.com/Manpreet/SMM282_Quantitative_Trading" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="js/order-book.js"></script>
+    <script src="js/visualization.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
