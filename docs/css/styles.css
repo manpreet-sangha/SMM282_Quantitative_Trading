@@ -110,13 +110,153 @@ header h1 {
 
 /* Main Content */
 .main-content {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 30px;
     margin-bottom: 30px;
 }
 
-/* Order Form */
+/* Mode Selection */
+.mode-selection {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+}
+
+.mode-selection h2 {
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.mode-buttons {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-mode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 30px 40px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 250px;
+}
+
+.btn-mode:hover:not(:disabled) {
+    border-color: var(--accent-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-mode:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mode-icon {
+    font-size: 2.5rem;
+}
+
+.mode-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.mode-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Demo Panel */
+.demo-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.demo-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.demo-header-bar h2 {
+    color: var(--accent-blue);
+    font-size: 1.3rem;
+}
+
+.demo-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    justify-content: center;
+}
+
+/* Step Indicator */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--bg-tertiary);
+    border-radius: 25px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+}
+
+.step span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--border-color);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.step.active {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.step.active span {
+    background: white;
+    color: var(--accent-blue);
+}
+
+.step.completed {
+    background: var(--accent-green);
+    color: white;
+}
+
+.step.completed span {
+    background: white;
+    color: var(--accent-green);
+}
+
+/* Order Form (legacy support) */
 .order-form-section {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -547,7 +687,8 @@ footer a:hover {
     border: 1px solid var(--border-color);
 }
 
-.demo-header {
+.demo-header,
+.demo-table-header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 10px;
@@ -559,7 +700,7 @@ footer a:hover {
 }
 
 .demo-orders {
-    min-height: 250px;
+    min-height: 280px;
 }
 
 .demo-order-row {

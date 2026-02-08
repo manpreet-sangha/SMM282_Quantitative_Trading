@@ -25,13 +25,40 @@ function init() {
     orderBook = new OrderBook();
     visualizer = new OrderBookVisualizer('depthChart');
     
-    // Set up form handler
-    document.getElementById('orderForm').addEventListener('submit', handleOrderSubmit);
-    
-    // Initial UI update
-    updateUI();
+    // Set up form handler (for future custom mode)
+    const orderForm = document.getElementById('orderForm');
+    if (orderForm) {
+        orderForm.addEventListener('submit', handleOrderSubmit);
+    }
     
     console.log('Order Book Simulator initialized');
+}
+
+/**
+ * Select demo mode
+ */
+function selectMode(mode) {
+    document.getElementById('modeSelection').style.display = 'none';
+    
+    if (mode === 'sample') {
+        document.getElementById('sampleDemo').style.display = 'block';
+        loadSampleOrders();
+    } else if (mode === 'custom') {
+        document.getElementById('customDemo').style.display = 'block';
+    }
+}
+
+/**
+ * Go back to mode selection
+ */
+function backToModeSelection() {
+    document.getElementById('sampleDemo').style.display = 'none';
+    document.getElementById('customDemo').style.display = 'none';
+    document.getElementById('modeSelection').style.display = 'block';
+    
+    // Reset demo state
+    demoOrders = [];
+    currentStep = 0;
 }
 
 /**
@@ -151,10 +178,12 @@ function updateDemoDisplay() {
     const stepTitle = document.getElementById('stepTitle');
     const stepDescription = document.getElementById('stepDescription');
     
+    // Update step title
     if (stepTitle) {
         stepTitle.textContent = `(${currentStep + 1}) ${stepNames[currentStep]}`;
     }
     
+    // Update step description
     if (stepDescription) {
         const descriptions = [
             'Orders displayed in the sequence they arrived at the exchange.',
@@ -165,13 +194,36 @@ function updateDemoDisplay() {
         stepDescription.textContent = descriptions[currentStep];
     }
     
+    // Update step indicators
+    for (let i = 1; i <= 4; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        if (stepEl) {
+            stepEl.classList.remove('active', 'completed');
+            if (i === currentStep + 1) {
+                stepEl.classList.add('active');
+            } else if (i < currentStep + 1) {
+                stepEl.classList.add('completed');
+            }
+        }
+    }
+    
+    // Update process button text
+    const processBtn = document.getElementById('processBtn');
+    if (processBtn) {
+        if (currentStep === STEPS.TIME) {
+            processBtn.textContent = '↺ Start Over';
+        } else {
+            processBtn.textContent = '▶ Process Limit Order Book';
+        }
+    }
+    
     // Create new rows with animation
     container.innerHTML = '';
     
     sorted.forEach((order, index) => {
         const row = document.createElement('div');
         row.className = 'demo-order-row';
-        row.style.animationDelay = `${index * 0.1}s`;
+        row.style.animationDelay = `${index * 0.08}s`;
         
         // Highlight rows that demonstrate the current sorting principle
         let highlight = '';

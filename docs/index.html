@@ -41,114 +41,72 @@
         </div>
 
         <div class="main-content">
-            <div class="order-form-section">
-                <h2>📝 Demo Controls</h2>
-                
-                <div class="quick-actions">
-                    <button class="btn btn-secondary" onclick="loadSampleOrders()">Load Sample Orders</button>
-                    <button class="btn btn-primary btn-large" onclick="processLimitOrderBook()">▶ Process Limit Order Book</button>
-                    <button class="btn btn-secondary" onclick="resetDemo()">Reset to Arrival Order</button>
-                    <button class="btn btn-danger" onclick="clearOrderBook()">Clear All</button>
+            <!-- Mode Selection -->
+            <div class="mode-selection" id="modeSelection">
+                <h2>Choose Demo Mode</h2>
+                <div class="mode-buttons">
+                    <button class="btn btn-mode" onclick="selectMode('sample')">
+                        <span class="mode-icon">📋</span>
+                        <span class="mode-title">Load Sample Orders</span>
+                        <span class="mode-desc">Pre-loaded orders from lecture example sorted by arrival time</span>
+                    </button>
+                    <button class="btn btn-mode" onclick="selectMode('custom')" disabled>
+                        <span class="mode-icon">✏️</span>
+                        <span class="mode-title">Custom Order Book</span>
+                        <span class="mode-desc">Create your own orders (Coming Soon)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sample Orders Demo Section -->
+            <div class="demo-panel" id="sampleDemo" style="display: none;">
+                <div class="demo-header-bar">
+                    <h2>📋 Limit Order Processing - Sequence of Buy Orders Example</h2>
+                    <button class="btn btn-secondary btn-small" onclick="backToModeSelection()">← Back</button>
+                </div>
+
+                <div class="demo-controls">
+                    <button class="btn btn-primary btn-large" onclick="processLimitOrderBook()" id="processBtn">
+                        ▶ Process Limit Order Book
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetDemo()">↺ Reset to Step 1</button>
+                </div>
+
+                <div class="step-indicator">
+                    <div class="step" id="step1"><span>1</span> Arrival Time</div>
+                    <div class="step" id="step2"><span>2</span> Price</div>
+                    <div class="step" id="step3"><span>3</span> Visibility</div>
+                    <div class="step" id="step4"><span>4</span> Time (FIFO)</div>
                 </div>
 
                 <div class="demo-section">
-                    <h2 id="stepTitle">Limit Order Processing Demo</h2>
-                    <p id="stepDescription" class="step-description">Load sample orders to see how buy orders are prioritised.</p>
+                    <h2 id="stepTitle">(1) Orders by Arrival Time</h2>
+                    <p id="stepDescription" class="step-description">Orders displayed in the sequence they arrived at the exchange.</p>
                     
                     <div class="demo-order-table">
-                        <div class="demo-header">
+                        <div class="demo-table-header">
                             <span>Limit Price</span>
                             <span>Visibility</span>
                             <span>Time</span>
                             <span>Trader Number</span>
                         </div>
-                        <div id="demoOrdersContainer" class="demo-orders">
-                            <div class="demo-empty">Click "Load Sample Orders" to begin</div>
-                        </div>
+                        <div id="demoOrdersContainer" class="demo-orders"></div>
                     </div>
                 </div>
-
-                <hr class="section-divider">
-
-                <h2>📝 Submit Custom Order</h2>
-                <form id="orderForm" class="order-form">
-                    <div class="form-group">
-                        <label for="orderId">Order ID</label>
-                        <input type="text" id="orderId" placeholder="Auto-generated" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="side">Side</label>
-                        <select id="side">
-                            <option value="BUY">BUY</option>
-                            <option value="SELL">SELL</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="price">Price</label>
-                        <input type="number" id="price" step="0.01" min="0" value="100.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" min="1" value="100" required>
-                    </div>
-                    <div class="form-group checkbox-group">
-                        <label>
-                            <input type="checkbox" id="isVisible" checked>
-                            Visible Order
-                        </label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Order</button>
-                </form>
             </div>
 
-            <div class="order-book-section">
-                <h2>📖 Order Book</h2>
-                <div class="market-data">
-                    <div class="market-stat">
-                        <span class="label">Best Bid</span>
-                        <span id="bestBid" class="value bid">-</span>
-                    </div>
-                    <div class="market-stat">
-                        <span class="label">Best Ask</span>
-                        <span id="bestAsk" class="value ask">-</span>
-                    </div>
-                    <div class="market-stat">
-                        <span class="label">Spread</span>
-                        <span id="spread" class="value">-</span>
-                    </div>
-                    <div class="market-stat">
-                        <span class="label">Midpoint</span>
-                        <span id="midpoint" class="value">-</span>
-                    </div>
+            <!-- Custom Order Book Section (Future) -->
+            <div class="custom-panel" id="customDemo" style="display: none;">
+                <div class="demo-header-bar">
+                    <h2>✏️ Custom Order Book</h2>
+                    <button class="btn btn-secondary btn-small" onclick="backToModeSelection()">← Back</button>
                 </div>
-
-                <div class="order-book-display">
-                    <div class="book-side asks">
-                        <h3>Asks (Sell Orders)</h3>
-                        <div class="book-header">
-                            <span>Price</span>
-                            <span>Quantity</span>
-                            <span>Orders</span>
-                        </div>
-                        <div id="asksContainer" class="book-rows"></div>
-                    </div>
-                    <div class="spread-indicator">
-                        <span>─── SPREAD ───</span>
-                    </div>
-                    <div class="book-side bids">
-                        <h3>Bids (Buy Orders)</h3>
-                        <div class="book-header">
-                            <span>Price</span>
-                            <span>Quantity</span>
-                            <span>Orders</span>
-                        </div>
-                        <div id="bidsContainer" class="book-rows"></div>
-                    </div>
-                </div>
+                <p>Custom order book feature coming soon...</p>
             </div>
         </div>
 
-        <div class="bottom-section">
+        <!-- Hidden sections for future use -->
+        <div class="bottom-section" id="bottomSection" style="display: none;">
             <div class="trades-section">
                 <h2>💱 Trade History</h2>
                 <div class="trades-table">
@@ -182,9 +140,26 @@
             </div>
         </div>
 
-        <div class="visualization-section">
+        <div class="visualization-section" id="vizSection" style="display: none;">
             <h2>📊 Depth Chart</h2>
             <canvas id="depthChart"></canvas>
+        </div>
+
+        <!-- Hidden form for order book functionality -->
+        <form id="orderForm" style="display: none;">
+            <input type="text" id="orderId">
+            <select id="side"><option value="BUY">BUY</option></select>
+            <input type="number" id="price" value="100">
+            <input type="number" id="quantity" value="100">
+            <input type="checkbox" id="isVisible" checked>
+        </form>
+        <div style="display: none;">
+            <span id="bestBid"></span>
+            <span id="bestAsk"></span>
+            <span id="spread"></span>
+            <span id="midpoint"></span>
+            <div id="asksContainer"></div>
+            <div id="bidsContainer"></div>
         </div>
 
         <footer>
