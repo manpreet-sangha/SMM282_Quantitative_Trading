@@ -4,7 +4,7 @@ A collection of simulations and implementations covering key concepts from the Q
 
 ## 🌐 Live Demo
 
-**[View the Order Book Simulator](https://manpreet.github.io/SMM282_Quantitative_Trading/)**
+**[View the Order Book Simulator](https://manpreet-sangha.github.io/SMM282_Quantitative_Trading/)**
 
 Interactive web-based visualization of the limit order book matching engine.
 
@@ -83,7 +83,7 @@ To enable GitHub Pages:
 4. Select `main` branch and `/docs` folder
 5. Save
 
-The site will be available at: `https://manpreet.github.io/SMM282_Quantitative_Trading/`
+The site will be available at: `https://manpreet-sangha.github.io/SMM282_Quantitative_Trading/`
 
 ## License
 
