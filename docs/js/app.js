@@ -239,26 +239,10 @@ function populateBuyStepOrders(stepNum, orders, prevOrders = null) {
         row.className = 'compact-row';
         row.style.animationDelay = `${index * 0.04}s`;
         
-        // Calculate movement for steps 2-4
-        let movementHtml = '';
-        if (showMovement) {
-            const prevPos = prevPositions[order.trader];
-            const movement = prevPos - index;
-            
-            if (movement > 0) {
-                movementHtml = `<span class="move-indicator move-up">↑${movement}</span>`;
-            } else if (movement < 0) {
-                movementHtml = `<span class="move-indicator move-down">↓${Math.abs(movement)}</span>`;
-            } else {
-                movementHtml = `<span class="move-indicator move-same">−</span>`;
-            }
-        }
-        
         const visDisplay = order.visible ? 'V' : 'H';
         const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
         row.innerHTML = `
-            ${movementHtml}
             <span class="cell-price">${order.price.toFixed(2)}</span>
             <span class="cell-vis ${visClass}">${visDisplay}</span>
             <span class="cell-time">${order.time}</span>
@@ -294,26 +278,10 @@ function populateSellStepOrders(stepNum, orders, prevOrders = null) {
         row.className = 'compact-row sell-row';
         row.style.animationDelay = `${index * 0.04}s`;
         
-        // Calculate movement for steps 2-4
-        let movementHtml = '';
-        if (showMovement) {
-            const prevPos = prevPositions[order.trader];
-            const movement = prevPos - index;
-            
-            if (movement > 0) {
-                movementHtml = `<span class="move-indicator move-up">↑${movement}</span>`;
-            } else if (movement < 0) {
-                movementHtml = `<span class="move-indicator move-down">↓${Math.abs(movement)}</span>`;
-            } else {
-                movementHtml = `<span class="move-indicator move-same">−</span>`;
-            }
-        }
-        
         const visDisplay = order.visible ? 'V' : 'H';
         const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
         row.innerHTML = `
-            ${movementHtml}
             <span class="cell-price sell-price">${order.price.toFixed(2)}</span>
             <span class="cell-vis ${visClass}">${visDisplay}</span>
             <span class="cell-time">${order.time}</span>
