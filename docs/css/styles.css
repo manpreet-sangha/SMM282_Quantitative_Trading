@@ -939,7 +939,7 @@ footer a:hover {
 
 .compact-row {
     display: grid;
-    grid-template-columns: 50px 45px 60px 50px;
+    grid-template-columns: 50px 40px 60px 40px;
     gap: 4px;
     padding: 6px 10px;
     border-bottom: 1px solid var(--bg-tertiary);
@@ -949,13 +949,14 @@ footer a:hover {
     overflow: hidden;
 }
 
-/* Add 5th column for steps 2-4 */
-#ordersStep2 .compact-row,
-#ordersStep3 .compact-row,
-#ordersStep4 .compact-row,
-[id^="buyOrdersStep"] .compact-row,
-[id^="sellOrdersStep"] .compact-row {
-    grid-template-columns: 50px 45px 60px 50px 30px;
+/* Add Δ column first for steps 2-4 */
+#buyOrdersStep2 .compact-row,
+#buyOrdersStep3 .compact-row,
+#buyOrdersStep4 .compact-row,
+#sellOrdersStep2 .compact-row,
+#sellOrdersStep3 .compact-row,
+#sellOrdersStep4 .compact-row {
+    grid-template-columns: 25px 50px 40px 60px 40px;
 }
 
 .compact-row:nth-child(odd) {

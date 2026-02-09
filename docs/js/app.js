@@ -258,11 +258,11 @@ function populateBuyStepOrders(stepNum, orders, prevOrders = null) {
         const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
         row.innerHTML = `
+            ${movementHtml}
             <span class="cell-price">${order.price.toFixed(2)}</span>
             <span class="cell-vis ${visClass}">${visDisplay}</span>
             <span class="cell-time">${order.time}</span>
             <span class="cell-trader">${order.trader}</span>
-            ${movementHtml}
         `;
         
         container.appendChild(row);
@@ -313,11 +313,11 @@ function populateSellStepOrders(stepNum, orders, prevOrders = null) {
         const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
         row.innerHTML = `
+            ${movementHtml}
             <span class="cell-price sell-price">${order.price.toFixed(2)}</span>
             <span class="cell-vis ${visClass}">${visDisplay}</span>
             <span class="cell-time">${order.time}</span>
             <span class="cell-trader sell-trader">${order.trader}</span>
-            ${movementHtml}
         `;
         
         container.appendChild(row);
