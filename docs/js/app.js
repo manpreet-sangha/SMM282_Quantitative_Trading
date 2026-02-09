@@ -391,6 +391,9 @@ function processBuyLimitOrderBook() {
     }
     
     updateBuyProcessButton();
+    
+    // Check if both demos are complete to show combined book
+    checkAndShowCombinedBook();
 }
 
 /**
@@ -426,6 +429,9 @@ function processSellLimitOrderBook() {
     }
     
     updateSellProcessButton();
+    
+    // Check if both demos are complete to show combined book
+    checkAndShowCombinedBook();
 }
 
 /**
@@ -442,6 +448,7 @@ function resetBuyDemo() {
     }
     
     updateBuyProcessButton();
+    hideCombinedBook();
 }
 
 /**
@@ -458,6 +465,7 @@ function resetSellDemo() {
     }
     
     updateSellProcessButton();
+    hideCombinedBook();
 }
 
 /**
@@ -656,6 +664,79 @@ function formatTime(date) {
         minute: '2-digit', 
         second: '2-digit' 
     });
+}
+
+/**
+ * Check if both buy and sell demos have completed all steps
+ */
+function checkAndShowCombinedBook() {
+    if (buyCurrentStep >= STEPS.TIME && sellCurrentStep >= STEPS.TIME) {
+        showCombinedBook();
+    }
+}
+
+/**
+ * Show the combined book section with Total Book and Visible Book
+ */
+function showCombinedBook() {
+    const section = document.getElementById('combinedBookSection');
+    if (!section) return;
+    
+    section.style.display = 'block';
+    
+    // Get final sorted orders
+    const buyOrders = getSortedOrdersForStep(STEPS.TIME, 'buy');
+    const sellOrders = getSortedOrdersForStep(STEPS.TIME, 'sell');
+    
+    // Populate Total Book (all orders)
+    populateBookRows('totalBookBids', buyOrders);
+    populateBookRows('totalBookOffers', sellOrders);
+    
+    // Populate Visible Book (only visible orders)
+    const visibleBuyOrders = buyOrders.filter(o => o.visible);
+    const visibleSellOrders = sellOrders.filter(o => o.visible);
+    populateBookRows('visibleBookBids', visibleBuyOrders);
+    populateBookRows('visibleBookOffers', visibleSellOrders);
+    
+    // Scroll to combined book section
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Populate a book section with order rows
+ */
+function populateBookRows(containerId, orders) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    orders.forEach((order, index) => {
+        const row = document.createElement('div');
+        row.className = 'book-row';
+        row.style.animationDelay = `${index * 0.05}s`;
+        
+        const visibilityText = order.visible ? 'Visible' : 'Hidden';
+        
+        row.innerHTML = `
+            <span class="cell-price">${order.price.toFixed(2)}</span>
+            <span class="cell-visibility">${visibilityText}</span>
+            <span class="cell-time">${order.time}</span>
+            <span class="cell-trader">${order.trader}</span>
+        `;
+        
+        container.appendChild(row);
+    });
+}
+
+/**
+ * Hide the combined book section
+ */
+function hideCombinedBook() {
+    const section = document.getElementById('combinedBookSection');
+    if (section) {
+        section.style.display = 'none';
+    }
 }
 
 // Initialize when DOM is ready
