@@ -915,6 +915,16 @@ footer a:hover {
     text-align: center;
 }
 
+/* Add Δ column at end for steps 2-4 headers */
+#buyStepCol2 .compact-header,
+#buyStepCol3 .compact-header,
+#buyStepCol4 .compact-header,
+#sellStepCol2 .compact-header,
+#sellStepCol3 .compact-header,
+#sellStepCol4 .compact-header {
+    grid-template-columns: 55px 30px 50px 30px 30px;
+}
+
 #buyStepCol4 .compact-header {
     background: var(--accent-green);
 }
@@ -939,6 +949,16 @@ footer a:hover {
     white-space: nowrap;
     overflow: hidden;
     align-items: center;
+}
+
+/* Add Δ column at end for steps 2-4 rows */
+#buyOrdersStep2 .compact-row,
+#buyOrdersStep3 .compact-row,
+#buyOrdersStep4 .compact-row,
+#sellOrdersStep2 .compact-row,
+#sellOrdersStep3 .compact-row,
+#sellOrdersStep4 .compact-row {
+    grid-template-columns: 55px 30px 50px 30px 30px;
 }
 
 .compact-row:nth-child(odd) {

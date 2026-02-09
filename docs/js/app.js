@@ -242,11 +242,27 @@ function populateBuyStepOrders(stepNum, orders, prevOrders = null) {
         const visDisplay = order.visible ? 'V' : 'H';
         const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
+        // Calculate movement for steps 2-4
+        let movementHtml = '';
+        if (showMovement) {
+            const prevPos = prevPositions[order.trader];
+            const movement = prevPos - index;
+            
+            if (movement > 0) {
+                movementHtml = `<span class="move-indicator move-up">↑${movement}</span>`;
+            } else if (movement < 0) {
+                movementHtml = `<span class="move-indicator move-down">↓${Math.abs(movement)}</span>`;
+            } else {
+                movementHtml = `<span class="move-indicator move-same">−</span>`;
+            }
+        }
+        
         row.innerHTML = `
             <span class="cell-price">${order.price.toFixed(2)}</span>
             <span class="cell-vis ${visClass}">${visDisplay}</span>
             <span class="cell-time">${order.time}</span>
             <span class="cell-trader">${order.trader}</span>
+            ${movementHtml}
         `;
         
         container.appendChild(row);
@@ -281,11 +297,27 @@ function populateSellStepOrders(stepNum, orders, prevOrders = null) {
         const visDisplay = order.visible ? 'V' : 'H';
         const visClass = order.visible ? 'vis-visible' : 'vis-hidden';
         
+        // Calculate movement for steps 2-4
+        let movementHtml = '';
+        if (showMovement) {
+            const prevPos = prevPositions[order.trader];
+            const movement = prevPos - index;
+            
+            if (movement > 0) {
+                movementHtml = `<span class="move-indicator move-up">↑${movement}</span>`;
+            } else if (movement < 0) {
+                movementHtml = `<span class="move-indicator move-down">↓${Math.abs(movement)}</span>`;
+            } else {
+                movementHtml = `<span class="move-indicator move-same">−</span>`;
+            }
+        }
+        
         row.innerHTML = `
             <span class="cell-price sell-price">${order.price.toFixed(2)}</span>
             <span class="cell-vis ${visClass}">${visDisplay}</span>
             <span class="cell-time">${order.time}</span>
             <span class="cell-trader sell-trader">${order.trader}</span>
+            ${movementHtml}
         `;
         
         container.appendChild(row);
