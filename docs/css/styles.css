@@ -813,9 +813,9 @@ footer a:hover {
 }
 
 .step-column {
-    flex: 1 1 0;
-    min-width: 220px;
-    max-width: 320px;
+    flex: 0 0 auto;
+    width: fit-content;
+    min-width: 195px;
     max-height: 380px;
     background: var(--bg-primary);
     border: 2px solid var(--border-color);
