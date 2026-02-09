@@ -903,7 +903,7 @@ footer a:hover {
     display: grid;
     grid-template-columns: 55px 30px 50px 30px;
     gap: 8px;
-    padding: 8px 12px;
+    padding: 8px 8px 8px 12px;
     background: var(--accent-blue);
     color: white;
     font-weight: 600;
@@ -942,7 +942,7 @@ footer a:hover {
     display: grid;
     grid-template-columns: 55px 30px 50px 30px;
     gap: 8px;
-    padding: 6px 12px;
+    padding: 6px 8px 6px 12px;
     border-bottom: 1px solid var(--bg-tertiary);
     animation: slideIn 0.3s ease-out forwards;
     opacity: 0;
