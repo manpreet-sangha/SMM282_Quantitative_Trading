@@ -901,9 +901,9 @@ footer a:hover {
 
 .compact-header {
     display: grid;
-    grid-template-columns: 55px 30px 55px 30px;
-    gap: 6px;
-    padding: 8px 10px;
+    grid-template-columns: 55px 25px 50px 30px;
+    gap: 8px;
+    padding: 8px 12px;
     background: var(--accent-blue);
     color: white;
     font-weight: 600;
@@ -922,7 +922,7 @@ footer a:hover {
 #sellStepCol2 .compact-header,
 #sellStepCol3 .compact-header,
 #sellStepCol4 .compact-header {
-    grid-template-columns: 22px 55px 30px 55px 30px;
+    grid-template-columns: 20px 55px 25px 50px 30px;
 }
 
 #buyStepCol4 .compact-header {
@@ -940,9 +940,9 @@ footer a:hover {
 
 .compact-row {
     display: grid;
-    grid-template-columns: 55px 30px 55px 30px;
-    gap: 6px;
-    padding: 6px 10px;
+    grid-template-columns: 55px 25px 50px 30px;
+    gap: 8px;
+    padding: 6px 12px;
     border-bottom: 1px solid var(--bg-tertiary);
     animation: slideIn 0.3s ease-out forwards;
     opacity: 0;
@@ -958,7 +958,7 @@ footer a:hover {
 #sellOrdersStep2 .compact-row,
 #sellOrdersStep3 .compact-row,
 #sellOrdersStep4 .compact-row {
-    grid-template-columns: 22px 55px 30px 55px 30px;
+    grid-template-columns: 20px 55px 25px 50px 30px;
 }
 
 .compact-row:nth-child(odd) {
