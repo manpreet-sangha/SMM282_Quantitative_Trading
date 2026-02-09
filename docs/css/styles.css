@@ -878,24 +878,17 @@ footer a:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0 10px;
-    min-height: 100px;
+    padding: 0 5px;
+    min-height: 60px;
     flex-shrink: 0;
 }
 
 .arrow-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--accent-blue);
-    background: rgba(9, 105, 218, 0.1);
-    padding: 4px 10px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    white-space: nowrap;
+    display: none;
 }
 
 .arrow-icon {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: var(--accent-blue);
     font-weight: bold;
 }
@@ -908,16 +901,17 @@ footer a:hover {
 
 .compact-header {
     display: grid;
-    grid-template-columns: 50px 40px 60px 40px;
-    gap: 4px;
+    grid-template-columns: 55px 30px 55px 30px;
+    gap: 6px;
     padding: 8px 10px;
     background: var(--accent-blue);
     color: white;
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    text-align: center;
 }
 
-.compact-header span:nth-child(5) {
+.compact-header span {
     text-align: center;
 }
 
@@ -928,7 +922,7 @@ footer a:hover {
 #sellStepCol2 .compact-header,
 #sellStepCol3 .compact-header,
 #sellStepCol4 .compact-header {
-    grid-template-columns: 25px 50px 40px 60px 40px;
+    grid-template-columns: 22px 55px 30px 55px 30px;
 }
 
 #buyStepCol4 .compact-header {
@@ -946,14 +940,15 @@ footer a:hover {
 
 .compact-row {
     display: grid;
-    grid-template-columns: 50px 40px 60px 40px;
-    gap: 4px;
+    grid-template-columns: 55px 30px 55px 30px;
+    gap: 6px;
     padding: 6px 10px;
     border-bottom: 1px solid var(--bg-tertiary);
     animation: slideIn 0.3s ease-out forwards;
     opacity: 0;
     white-space: nowrap;
     overflow: hidden;
+    align-items: center;
 }
 
 /* Add Δ column first for steps 2-4 */
@@ -963,7 +958,7 @@ footer a:hover {
 #sellOrdersStep2 .compact-row,
 #sellOrdersStep3 .compact-row,
 #sellOrdersStep4 .compact-row {
-    grid-template-columns: 25px 50px 40px 60px 40px;
+    grid-template-columns: 22px 55px 30px 55px 30px;
 }
 
 .compact-row:nth-child(odd) {
