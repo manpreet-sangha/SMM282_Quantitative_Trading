@@ -908,28 +908,35 @@ footer a:hover {
 
 .compact-header {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 8px;
-    padding: 10px 15px;
+    grid-template-columns: 50px 40px 60px 40px;
+    gap: 4px;
+    padding: 8px 10px;
     background: var(--accent-blue);
     color: white;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .compact-header span:nth-child(5) {
     text-align: center;
 }
 
-/* Add 5th column for steps 2-4 */
-#stepCol2 .compact-header,
-#stepCol3 .compact-header,
-#stepCol4 .compact-header {
-    grid-template-columns: 1fr 1fr 1fr 1fr 0.8fr;
+/* Add Δ column first for steps 2-4 headers */
+#buyStepCol2 .compact-header,
+#buyStepCol3 .compact-header,
+#buyStepCol4 .compact-header,
+#sellStepCol2 .compact-header,
+#sellStepCol3 .compact-header,
+#sellStepCol4 .compact-header {
+    grid-template-columns: 25px 50px 40px 60px 40px;
 }
 
-#stepCol4 .compact-header {
+#buyStepCol4 .compact-header {
     background: var(--accent-green);
+}
+
+#sellStepCol4 .compact-header {
+    background: var(--accent-red);
 }
 
 .compact-rows {
