@@ -670,7 +670,9 @@ function formatTime(date) {
  * Check if both buy and sell demos have completed all steps
  */
 function checkAndShowCombinedBook() {
+    console.log('Checking combined book:', 'buyStep:', buyCurrentStep, 'sellStep:', sellCurrentStep, 'STEPS.TIME:', STEPS.TIME);
     if (buyCurrentStep >= STEPS.TIME && sellCurrentStep >= STEPS.TIME) {
+        console.log('Both complete! Showing combined book...');
         showCombinedBook();
     }
 }
@@ -679,10 +681,13 @@ function checkAndShowCombinedBook() {
  * Show the combined book section with Total Book and Visible Book
  */
 function showCombinedBook() {
+    console.log('showCombinedBook called');
     const section = document.getElementById('combinedBookSection');
+    console.log('Section element:', section);
     if (!section) return;
     
     section.style.display = 'block';
+    console.log('Set display to block');
     
     // Get final sorted orders
     const buyOrders = getSortedOrdersForStep(STEPS.TIME, 'buy');
