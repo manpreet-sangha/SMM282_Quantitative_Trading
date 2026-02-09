@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Limit Order Book Simulator | SMM282 Quantitative Trading</title>
-    <link rel="stylesheet" href="css/styles.css?v=7">
+    <link rel="stylesheet" href="css/styles.css?v=9">
 </head>
 <body>
     <div class="container">
@@ -12,132 +12,378 @@
             <h1>Limit Order Book Simulator</h1>
             <p class="subtitle">SMM282 Quantitative Trading - Price-Visibility-Time Priority</p>
         </header>
+
         <div class="info-panel">
             <h3>Matching Priority Rules</h3>
             <div class="rules">
                 <div class="rule">
                     <span class="rule-num">1</span>
-                    <div><strong>Price First</strong><p>Buy orders with higher limit prices get priority. Sell orders with lower limit prices get priority.</p></div>
+                    <div>
+                        <strong>Price First</strong>
+                        <p>Buy orders with higher limit prices get priority. Sell orders with lower limit prices get priority.</p>
+                    </div>
                 </div>
                 <div class="rule">
                     <span class="rule-num">2</span>
-                    <div><strong>Visibility</strong><p>Visible orders get priority over hidden orders at the same price level.</p></div>
+                    <div>
+                        <strong>Visibility</strong>
+                        <p>Visible orders get priority over hidden orders at the same price level.</p>
+                    </div>
                 </div>
                 <div class="rule">
                     <span class="rule-num">3</span>
-                    <div><strong>Time (FIFO)</strong><p>Earlier submitted orders get priority at the same price and visibility.</p></div>
+                    <div>
+                        <strong>Time (FIFO)</strong>
+                        <p>Earlier submitted orders get priority at the same price and visibility.</p>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="main-content">
+            <!-- Mode Selection -->
             <div class="mode-selection" id="modeSelection">
                 <h2>Choose Demo Mode</h2>
                 <div class="mode-buttons">
                     <button class="btn btn-mode" onclick="selectMode('sample')">
+                        <span class="mode-icon">📋</span>
                         <span class="mode-title">Load Sample Orders</span>
-                        <span class="mode-desc">Pre-loaded orders from lecture example</span>
+                        <span class="mode-desc">Pre-loaded orders from lecture example sorted by arrival time</span>
+                    </button>
+                    <button class="btn btn-mode" onclick="selectMode('custom')" disabled>
+                        <span class="mode-icon">✏️</span>
+                        <span class="mode-title">Custom Order Book</span>
+                        <span class="mode-desc">Create your own orders (Coming Soon)</span>
                     </button>
                 </div>
             </div>
+
+            <!-- Sample Orders Demo Section -->
             <div class="demo-panel" id="sampleDemo" style="display: none;">
+                
+                <!-- BUY ORDERS SECTION -->
                 <div class="order-section buy-section">
                     <div class="section-header">
                         <h2>Limit Order Processing - Buy Orders Priority Rules</h2>
                         <p class="section-note">Higher prices get priority for buy orders</p>
                     </div>
+
                     <div class="demo-controls">
-                        <button class="btn btn-primary" onclick="processBuyLimitOrderBook()" id="buyProcessBtn">Apply Price Priority</button>
-                        <button class="btn btn-secondary" onclick="resetBuyDemo()">Reset</button>
+                        <button class="btn btn-primary" onclick="processBuyLimitOrderBook()" id="buyProcessBtn">
+                            ▶ Apply Price Priority
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetBuyDemo()">↺ Reset</button>
                     </div>
+
+                    <!-- Horizontal columns layout for Buy Orders -->
                     <div id="buyStepsContainer" class="steps-horizontal">
+                        <!-- Column 1: Arrival Order -->
                         <div class="step-column" id="buyStepCol1">
-                            <div class="column-header"><span class="col-step-num">1</span><span class="col-title">Arrival Time</span></div>
+                            <div class="column-header">
+                                <span class="col-step-num">1</span>
+                                <span class="col-title">Arrival Time</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span></div>
+                                <div class="compact-header">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                </div>
                                 <div id="buyOrdersStep1" class="compact-rows"></div>
                             </div>
                         </div>
-                        <div class="step-arrow" id="buyArrow1" style="display: none;"><div class="arrow-label">Price</div><div class="arrow-icon">-></div></div>
+
+                        <div class="step-arrow" id="buyArrow1" style="display: none;">
+                            <div class="arrow-icon">→</div>
+                        </div>
+
                         <div class="step-column" id="buyStepCol2" style="display: none;">
-                            <div class="column-header highlight-price"><span class="col-step-num">2</span><span class="col-title">+ Price</span></div>
+                            <div class="column-header highlight-price">
+                                <span class="col-step-num">2</span>
+                                <span class="col-title">Sort by Price</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span><span>D</span></div>
+                                <div class="compact-header">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                    <span>Δ</span>
+                                </div>
                                 <div id="buyOrdersStep2" class="compact-rows"></div>
                             </div>
                         </div>
-                        <div class="step-arrow" id="buyArrow2" style="display: none;"><div class="arrow-label">Visibility</div><div class="arrow-icon">-></div></div>
+
+                        <div class="step-arrow" id="buyArrow2" style="display: none;">
+                            <div class="arrow-icon">→</div>
+                        </div>
+
                         <div class="step-column" id="buyStepCol3" style="display: none;">
-                            <div class="column-header highlight-visibility"><span class="col-step-num">3</span><span class="col-title">+ Visibility</span></div>
+                            <div class="column-header highlight-visibility">
+                                <span class="col-step-num">3</span>
+                                <span class="col-title">+ Visibility</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span><span>D</span></div>
+                                <div class="compact-header">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                    <span>Δ</span>
+                                </div>
                                 <div id="buyOrdersStep3" class="compact-rows"></div>
                             </div>
                         </div>
-                        <div class="step-arrow" id="buyArrow3" style="display: none;"><div class="arrow-label">Time</div><div class="arrow-icon">-></div></div>
+
+                        <div class="step-arrow" id="buyArrow3" style="display: none;">
+                            <div class="arrow-icon">→</div>
+                        </div>
+
                         <div class="step-column final-column" id="buyStepCol4" style="display: none;">
-                            <div class="column-header highlight-time"><span class="col-step-num">4</span><span class="col-title">+ Time (Final)</span></div>
+                            <div class="column-header highlight-time">
+                                <span class="col-step-num">4</span>
+                                <span class="col-title">+ Time (Final)</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header final-header"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span><span>D</span></div>
+                                <div class="compact-header final-header">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                    <span>Δ</span>
+                                </div>
                                 <div id="buyOrdersStep4" class="compact-rows"></div>
                             </div>
-                            <div class="final-badge">Final Priority</div>
+                            <div class="final-badge">✓ Final Priority</div>
                         </div>
                     </div>
                 </div>
+
+                <!-- SELL ORDERS SECTION -->
                 <div class="order-section sell-section">
                     <div class="section-header">
                         <h2>Limit Order Processing - Sell Orders Priority Rules</h2>
                         <p class="section-note">Lower prices get priority for sell orders</p>
                     </div>
+
                     <div class="demo-controls">
-                        <button class="btn btn-primary btn-sell" onclick="processSellLimitOrderBook()" id="sellProcessBtn">Apply Price Priority</button>
-                        <button class="btn btn-secondary" onclick="resetSellDemo()">Reset</button>
+                        <button class="btn btn-primary btn-sell" onclick="processSellLimitOrderBook()" id="sellProcessBtn">
+                            ▶ Apply Price Priority
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetSellDemo()">↺ Reset</button>
                     </div>
+
+                    <!-- Horizontal columns layout for Sell Orders -->
                     <div id="sellStepsContainer" class="steps-horizontal sell-mode">
+                        <!-- Column 1: Arrival Order -->
                         <div class="step-column" id="sellStepCol1">
-                            <div class="column-header"><span class="col-step-num sell-num">1</span><span class="col-title">Arrival Time</span></div>
+                            <div class="column-header">
+                                <span class="col-step-num sell-num">1</span>
+                                <span class="col-title">Arrival Time</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header sell-header"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span></div>
+                                <div class="compact-header sell-header">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                </div>
                                 <div id="sellOrdersStep1" class="compact-rows"></div>
                             </div>
                         </div>
-                        <div class="step-arrow" id="sellArrow1" style="display: none;"><div class="arrow-label sell-label">Price</div><div class="arrow-icon">-></div></div>
+
+                        <div class="step-arrow" id="sellArrow1" style="display: none;">
+                            <div class="arrow-icon">→</div>
+                        </div>
+
                         <div class="step-column" id="sellStepCol2" style="display: none;">
-                            <div class="column-header highlight-price-sell"><span class="col-step-num sell-num">2</span><span class="col-title">+ Price</span></div>
+                            <div class="column-header highlight-price-sell">
+                                <span class="col-step-num sell-num">2</span>
+                                <span class="col-title">Sort by Price</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header sell-header"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span><span>D</span></div>
+                                <div class="compact-header sell-header">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                    <span>Δ</span>
+                                </div>
                                 <div id="sellOrdersStep2" class="compact-rows"></div>
                             </div>
                         </div>
-                        <div class="step-arrow" id="sellArrow2" style="display: none;"><div class="arrow-label">Visibility</div><div class="arrow-icon">-></div></div>
+
+                        <div class="step-arrow" id="sellArrow2" style="display: none;">
+                            <div class="arrow-icon">→</div>
+                        </div>
+
                         <div class="step-column" id="sellStepCol3" style="display: none;">
-                            <div class="column-header highlight-visibility"><span class="col-step-num sell-num">3</span><span class="col-title">+ Visibility</span></div>
+                            <div class="column-header highlight-visibility">
+                                <span class="col-step-num sell-num">3</span>
+                                <span class="col-title">+ Visibility</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header sell-header"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span><span>D</span></div>
+                                <div class="compact-header sell-header">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                    <span>Δ</span>
+                                </div>
                                 <div id="sellOrdersStep3" class="compact-rows"></div>
                             </div>
                         </div>
-                        <div class="step-arrow" id="sellArrow3" style="display: none;"><div class="arrow-label">Time</div><div class="arrow-icon">-></div></div>
+
+                        <div class="step-arrow" id="sellArrow3" style="display: none;">
+                            <div class="arrow-icon">→</div>
+                        </div>
+
                         <div class="step-column final-column" id="sellStepCol4" style="display: none;">
-                            <div class="column-header highlight-time"><span class="col-step-num sell-num">4</span><span class="col-title">+ Time (Final)</span></div>
+                            <div class="column-header highlight-time">
+                                <span class="col-step-num sell-num">4</span>
+                                <span class="col-title">+ Time (Final)</span>
+                            </div>
                             <div class="compact-table">
-                                <div class="compact-header final-header-sell"><span>Price</span><span>Vis</span><span>Time</span><span>T#</span><span>D</span></div>
+                                <div class="compact-header final-header-sell">
+                                    <span>Price</span>
+                                    <span>Vis</span>
+                                    <span>Time</span>
+                                    <span>T#</span>
+                                    <span>Δ</span>
+                                </div>
                                 <div id="sellOrdersStep4" class="compact-rows"></div>
                             </div>
-                            <div class="final-badge">Final Priority</div>
+                            <div class="final-badge">✓ Final Priority</div>
                         </div>
                     </div>
                 </div>
-                <div class="demo-legend">
-                    <span class="legend-item"><span class="arrow-up">Up</span> Moved Up</span>
-                    <span class="legend-item"><span class="arrow-down">Down</span> Moved Down</span>
-                    <span class="legend-item"><span class="arrow-same">-</span> Same Position</span>
+
+                <!-- COMBINED BOOK SECTION -->
+                <div class="order-section combined-section" id="combinedBookSection" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="combined-title">Limit Order Processing - The Combined Book</h2>
+                    </div>
+
+                    <!-- TOTAL BOOK -->
+                    <div class="book-subsection">
+                        <h3 class="book-title">TOTAL BOOK</h3>
+                        <div class="book-columns">
+                            <div class="book-side bids-side">
+                                <h4>Bids</h4>
+                                <div class="book-table">
+                                    <div class="book-header">
+                                        <span>Limit Price</span>
+                                        <span>Visibility</span>
+                                        <span>Time</span>
+                                        <span>Trader Number</span>
+                                    </div>
+                                    <div id="totalBookBids" class="book-rows"></div>
+                                </div>
+                            </div>
+                            <div class="book-side offers-side">
+                                <h4>Offers</h4>
+                                <div class="book-table">
+                                    <div class="book-header">
+                                        <span>Limit Price</span>
+                                        <span>Visibility</span>
+                                        <span>Time</span>
+                                        <span>Trader Number</span>
+                                    </div>
+                                    <div id="totalBookOffers" class="book-rows"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VISIBLE BOOK -->
+                    <div class="book-subsection">
+                        <h3 class="book-title">VISIBLE BOOK</h3>
+                        <div class="book-columns">
+                            <div class="book-side bids-side">
+                                <h4>Bids</h4>
+                                <div class="book-table">
+                                    <div class="book-header">
+                                        <span>Limit Price</span>
+                                        <span>Visibility</span>
+                                        <span>Time</span>
+                                        <span>Trader Number</span>
+                                    </div>
+                                    <div id="visibleBookBids" class="book-rows"></div>
+                                </div>
+                            </div>
+                            <div class="book-side offers-side">
+                                <h4>Offers</h4>
+                                <div class="book-table">
+                                    <div class="book-header">
+                                        <span>Limit Price</span>
+                                        <span>Visibility</span>
+                                        <span>Time</span>
+                                        <span>Trader Number</span>
+                                    </div>
+                                    <div id="visibleBookOffers" class="book-rows"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="back-button-container">
-                    <button class="btn btn-secondary" onclick="backToModeSelection()">Back to Mode Selection</button>
+                    <button class="btn btn-secondary" onclick="backToModeSelection()">← Back to Mode Selection</button>
+                </div>
+            </div>
+
+            <!-- Custom Order Book Section (Future) -->
+            <div class="custom-panel" id="customDemo" style="display: none;">
+                <div class="demo-header-bar">
+                    <h2>Custom Order Book</h2>
+                    <button class="btn btn-secondary btn-small" onclick="backToModeSelection()">← Back</button>
+                </div>
+                <p>Custom order book feature coming soon...</p>
+            </div>
+        </div>
+
+        <!-- Hidden sections for future use -->
+        <div class="bottom-section" id="bottomSection" style="display: none;">
+            <div class="trades-section">
+                <h2>Trade History</h2>
+                <div class="trades-table">
+                    <div class="trades-header">
+                        <span>Trade ID</span>
+                        <span>Buy Order</span>
+                        <span>Sell Order</span>
+                        <span>Price</span>
+                        <span>Quantity</span>
+                        <span>Time</span>
+                    </div>
+                    <div id="tradesContainer" class="trades-rows"></div>
+                </div>
+            </div>
+
+            <div class="orders-section">
+                <h2>All Orders</h2>
+                <div class="orders-table">
+                    <div class="orders-header">
+                        <span>ID</span>
+                        <span>Side</span>
+                        <span>Price</span>
+                        <span>Qty</span>
+                        <span>Filled</span>
+                        <span>Visible</span>
+                        <span>Status</span>
+                        <span>Action</span>
+                    </div>
+                    <div id="ordersContainer" class="orders-rows"></div>
                 </div>
             </div>
         </div>
+
+        <div class="visualization-section" id="vizSection" style="display: none;">
+            <h2>Depth Chart</h2>
+            <canvas id="depthChart"></canvas>
+        </div>
+
+        <!-- Hidden form for order book functionality -->
         <form id="orderForm" style="display: none;">
             <input type="text" id="orderId">
             <select id="side"><option value="BUY">BUY</option></select>
@@ -146,16 +392,22 @@
             <input type="checkbox" id="isVisible" checked>
         </form>
         <div style="display: none;">
-            <span id="bestBid"></span><span id="bestAsk"></span><span id="spread"></span><span id="midpoint"></span>
-            <div id="asksContainer"></div><div id="bidsContainer"></div>
+            <span id="bestBid"></span>
+            <span id="bestAsk"></span>
+            <span id="spread"></span>
+            <span id="midpoint"></span>
+            <div id="asksContainer"></div>
+            <div id="bidsContainer"></div>
         </div>
+
         <footer>
             <p>SMM282 Quantitative Trading | Bayes Business School @ City St George's, University of London</p>
             <p><a href="https://github.com/manpreet-sangha/SMM282_Quantitative_Trading" target="_blank">View on GitHub</a></p>
         </footer>
     </div>
-    <script src="js/order-book.js?v=7"></script>
-    <script src="js/visualization.js?v=7"></script>
-    <script src="js/app.js?v=7"></script>
+
+    <script src="js/order-book.js?v=8"></script>
+    <script src="js/visualization.js?v=8"></script>
+    <script src="js/app.js?v=8"></script>
 </body>
 </html>
