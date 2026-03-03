@@ -12,6 +12,13 @@ Interactive web-based visualization of the limit order book matching engine.
 
 ```
 SMM282_Quantitative_Trading/
+├── Exercises/
+│   └── session 4/            # CAPM & Fama-MacBeth exercises
+│       ├── solveCAPMExercise.py
+│       ├── solveFamaMacBethExercise.py
+│       ├── stockReturns.xlsx
+│       ├── uk_data.xlsx
+│       └── charts/           # Auto-generated visualizations
 ├── simulations/
 │   ├── order_book/           # Order book and matching engine simulations (Python)
 │   └── ...
@@ -38,6 +45,42 @@ Simulates a limit order book with the following priority rules:
 
 3. **Time**: For orders with same price and visibility
    - Earlier submitted orders get priority (FIFO)
+
+## Exercises
+
+### Session 4: Asset Pricing Models
+
+#### CAPM Exercise (`solveCAPMExercise.py`)
+
+Implements the **Capital Asset Pricing Model (CAPM)** for 4 UK stocks (Tesco, Barclays, Vodafone, British Land) using OLS regression.
+
+**What it computes:**
+- **Beta (β)** — each stock's sensitivity to market movements
+- **Systematic Risk** — market-driven risk (β × σ_market), cannot be diversified away
+- **Specific Risk** — company-specific risk (std dev of regression residuals), can be diversified away
+
+**Visualizations** (saved to `charts/capm_summary.png`):
+- Beta comparison bar chart (red = β > 1, blue = β < 1)
+- Stacked risk decomposition (systematic vs specific)
+- Beta vs Total Risk scatter plot
+
+#### Fama-MacBeth Exercise (`solveFamaMacBethExercise.py`)
+
+Implements the **Fama-MacBeth two-pass regression** procedure to test whether the market rewards beta risk with higher returns.
+
+**How it works:**
+1. At each time period, runs a **cross-sectional regression** of stock returns on their previous-period betas
+2. Extracts the slope coefficient **γ₁** (the market risk premium) for each period
+3. Tests whether the average γ₁ is statistically significant using a **t-statistic**
+
+**Interpretation:**
+- **Positive mean γ₁** → stocks with higher betas earned higher returns on average
+- **|t-stat| > 2** → the risk premium is statistically significant at the 5% level
+- **T-stat bar turns red** if significant, gray if not
+
+**Visualizations** (saved to `charts/fama_macbeth_summary.png`):
+- Factor returns (γ₁) over time — shows stability of the risk premium
+- Mean factor return & t-statistic summary
 
 ## Installation
 

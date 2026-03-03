@@ -4,7 +4,6 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from adjustText import adjust_text
 
 def computeCAPMStats(r, rIdx):
 
@@ -128,124 +127,54 @@ output_dir = os.path.join(datadir, 'charts')
 os.makedirs(output_dir, exist_ok=True)
 
 # ============================================================
-# CHART 1: Beta values with reference line at β=1
+# All 3 charts in one figure
 # ============================================================
-colors_beta = ['#e74c3c' if b > 1 else '#3498db' for b in beta]
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 8))
 
-fig1, ax1 = plt.subplots(figsize=(10, 5), num='Chart 1 — CAPM Betas')
-bars = ax1.bar(names, beta, color=colors_beta, edgecolor='white', linewidth=1.5)
-ax1.axhline(y=1, color='gray', linestyle='--', linewidth=1, label='Market (β=1)')
-ax1.set_title('CAPM Betas — Market Sensitivity', fontsize=16, fontweight='bold', pad=15)
-ax1.set_ylabel('Beta (β)', fontsize=12)
-
-# Add value labels on each bar
+# --- Chart 1: Betas ---
+colors_beta = ['#c0392b' if b > 1 else '#2980b9' for b in beta]
+bars = ax1.bar(names, beta, color=colors_beta, edgecolor='white', width=0.4)
+ax1.axhline(y=1, color='gray', linestyle='--', linewidth=0.8, label='Market (β=1)')
+ax1.set_title('CAPM Betas', fontsize=11, fontweight='bold')
+ax1.set_ylabel('Beta (β)', fontsize=9)
 for bar, b in zip(bars, beta):
-    ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.03,
-             f'{b:.2f}', ha='center', va='bottom', fontsize=12, fontweight='bold')
+    ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.02,
+             f'{b:.2f}', ha='center', va='bottom', fontsize=8, fontweight='bold')
+ax1.legend(fontsize=8)
+ax1.set_ylim(0, max(beta) * 1.15)
+ax1.tick_params(labelsize=8)
 
-ax1.legend(fontsize=11)
-ax1.set_ylim(0, max(beta) * 1.25)
-ax1.spines['top'].set_visible(False)
-ax1.spines['right'].set_visible(False)
-plt.tight_layout()
-fig1.savefig(os.path.join(output_dir, '1_betas.png'), dpi=150, bbox_inches='tight')
-print(f"Chart 1 saved to {os.path.join(output_dir, '1_betas.png')}")
-plt.show(block=False)
-
-# ============================================================
-# CHART 2: Stacked bar — Systematic vs Specific Risk with individual contributions
-# ============================================================
-fig2, ax2 = plt.subplots(figsize=(10, 6), num='Chart 2 — Risk Decomposition')
+# --- Chart 2: Risk Decomposition (stacked) ---
 x = np.arange(len(names))
-width = 0.5
-
 totalRisk = sysRisk + specRisk
-sysPct = (sysRisk / totalRisk) * 100
-specPct = (specRisk / totalRisk) * 100
-
-bars_sys = ax2.bar(x, sysRisk, width, label='Systematic Risk (Market)', color='#c0392b', edgecolor='white')
-bars_spec = ax2.bar(x, specRisk, width, bottom=sysRisk, label='Specific Risk (Company)', color='#2980b9', edgecolor='white')
-
-ax2.set_title('Risk Decomposition — Systematic vs Company-Specific', fontsize=16, fontweight='bold', pad=15)
-ax2.set_ylabel('Risk (Std Dev of Returns)', fontsize=12)
+ax2.bar(x, sysRisk, 0.4, label='Systematic', color='#c0392b', edgecolor='white')
+ax2.bar(x, specRisk, 0.4, bottom=sysRisk, label='Specific', color='#2980b9', edgecolor='white')
+ax2.set_title('Risk Decomposition', fontsize=11, fontweight='bold')
+ax2.set_ylabel('Risk (Std Dev)', fontsize=9)
 ax2.set_xticks(x)
-ax2.set_xticklabels(names, fontsize=10)
-ax2.legend(fontsize=11, loc='upper right')
-
-# Add individual contribution labels inside each segment
+ax2.set_xticklabels(names, fontsize=8)
 for i in range(len(names)):
-    # Systematic risk label (inside lower bar)
-    ax2.text(i, sysRisk[i] / 2, f'{sysRisk[i]:.4f}\n({sysPct[i]:.1f}%)',
-             ha='center', va='center', fontsize=9, fontweight='bold', color='white')
-    # Specific risk label (inside upper bar)
-    ax2.text(i, sysRisk[i] + specRisk[i] / 2, f'{specRisk[i]:.4f}\n({specPct[i]:.1f}%)',
-             ha='center', va='center', fontsize=9, fontweight='bold', color='white')
+    ax2.text(i, totalRisk[i] + 0.0002, f'{totalRisk[i]:.4f}',
+             ha='center', va='bottom', fontsize=7)
+ax2.legend(fontsize=8)
+ax2.tick_params(labelsize=8)
 
-# Add total risk labels on top
-for i, t in enumerate(totalRisk):
-    ax2.text(i, t + 0.0005, f'Total: {t:.4f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
-
-ax2.spines['top'].set_visible(False)
-ax2.spines['right'].set_visible(False)
-plt.tight_layout()
-fig2.savefig(os.path.join(output_dir, '2_risk_decomposition.png'), dpi=150, bbox_inches='tight')
-print(f"Chart 2 saved to {os.path.join(output_dir, '2_risk_decomposition.png')}")
-plt.show(block=False)
-
-# ============================================================
-# CHART 3: Scatter plot — Beta vs Total Risk (auto-adjusted labels)
-# ============================================================
-fig3, ax3 = plt.subplots(figsize=(10, 7), num='Chart 3 — Beta vs Total Risk')
-totalRisk = sysRisk + specRisk
-
-# Professional color palette
+# --- Chart 3: Beta vs Total Risk (scatter) ---
 point_colors = ['#2c3e50', '#c0392b', '#2980b9', '#27ae60']
-
-# Plot each stock as a distinct point
 for i, name in enumerate(names):
-    ax3.scatter(beta[i], totalRisk[i], s=300, c=point_colors[i % len(point_colors)],
-                edgecolors='white', linewidth=2, zorder=5, label=name)
+    ax3.scatter(beta[i], totalRisk[i], s=100, c=point_colors[i], edgecolors='white', linewidth=1.5, zorder=5)
+    ax3.annotate(name, (beta[i], totalRisk[i]), textcoords="offset points",
+                 xytext=(6, 6), fontsize=7)
+ax3.axvline(x=1, color='gray', linestyle='--', linewidth=0.8, label='Market (β=1)')
+ax3.set_title('Beta vs Total Risk', fontsize=11, fontweight='bold')
+ax3.set_xlabel('Beta (β)', fontsize=9)
+ax3.set_ylabel('Total Risk', fontsize=9)
+ax3.legend(fontsize=8)
+ax3.grid(True, alpha=0.15, linestyle='--')
+ax3.tick_params(labelsize=8)
 
-# Create text objects for adjustText to auto-position
-texts = []
-for i, name in enumerate(names):
-    t = ax3.text(beta[i], totalRisk[i],
-                 f'  {name}\n  β={beta[i]:.2f}  Risk={totalRisk[i]:.4f}',
-                 fontsize=9, fontfamily='sans-serif',
-                 bbox=dict(boxstyle='round,pad=0.4', facecolor='#f8f9fa',
-                           edgecolor=point_colors[i % len(point_colors)], alpha=0.95))
-    texts.append(t)
-
-# Auto-adjust text positions to avoid all overlaps
-adjust_text(texts, ax=ax3,
-            arrowprops=dict(arrowstyle='->', color='#adb5bd', lw=1.2),
-            expand=(2.0, 2.0),
-            force_text=(1.5, 1.5),
-            force_points=(1.0, 1.0))
-
-ax3.axvline(x=1, color='#adb5bd', linestyle='--', linewidth=1, alpha=0.8, label='Market (β=1)')
-
-ax3.set_xlabel('Beta (β) — Market Sensitivity', fontsize=12, fontfamily='sans-serif')
-ax3.set_ylabel('Total Risk (Systematic + Specific)', fontsize=12, fontfamily='sans-serif')
-ax3.set_title('Beta vs Total Risk', fontsize=16, fontweight='bold', fontfamily='sans-serif', pad=15)
-
-# Add generous margin so labels never get clipped
-x_margin = (max(beta) - min(beta)) * 0.5
-y_margin = (max(totalRisk) - min(totalRisk)) * 0.5
-ax3.set_xlim(min(beta) - x_margin, max(beta) + x_margin)
-ax3.set_ylim(min(totalRisk) - y_margin, max(totalRisk) + y_margin)
-
-ax3.legend(fontsize=10, loc='lower right', framealpha=0.9)
-ax3.spines['top'].set_visible(False)
-ax3.spines['right'].set_visible(False)
-ax3.grid(True, alpha=0.2, linestyle='--')
 plt.tight_layout()
-fig3.savefig(os.path.join(output_dir, '3_beta_vs_total_risk.png'), dpi=150, bbox_inches='tight')
-print(f"Chart 3 saved to {os.path.join(output_dir, '3_beta_vs_total_risk.png')}")
-plt.show(block=False)
-
-# Keep all windows open until user closes them
-print(f"\nAll charts saved to: {output_dir}")
-print("Close all chart windows to exit.")
+fig.savefig(os.path.join(output_dir, 'capm_summary.png'), dpi=150, bbox_inches='tight')
+print(f"Chart saved to {os.path.join(output_dir, 'capm_summary.png')}")
 plt.show()
 
